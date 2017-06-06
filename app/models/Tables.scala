@@ -21,13 +21,13 @@ trait Tables {
   /** Entity class storing rows of table Member
    *  @param memberId Database column MEMBER_ID SqlType(BIGINT), AutoInc, PrimaryKey
    *  @param memberName Database column MEMBER_NAME SqlType(VARCHAR), Length(50,true)
-   *  @param emailAddress Database column EMAIL_ADDRESS SqlType(VARCHAR), Length(50,true)
    *  @param memberAccount Database column MEMBER_ACCOUNT SqlType(VARCHAR), Length(50,true)
+   *  @param emailAddress Database column EMAIL_ADDRESS SqlType(VARCHAR), Length(50,true)
    *  @param memberAvatar Database column MEMBER_AVATAR SqlType(VARCHAR), Length(200,true)
    *  @param registerDatetime Database column REGISTER_DATETIME SqlType(DATETIME)
    *  @param updateDatetime Database column UPDATE_DATETIME SqlType(DATETIME)
    *  @param versionNo Database column VERSION_NO SqlType(BIGINT) */
-  case class MemberRow(memberId: Long, memberName: String, emailAddress: String, memberAccount: String, memberAvatar: String, registerDatetime: java.sql.Timestamp, updateDatetime: java.sql.Timestamp, versionNo: Long)
+  case class MemberRow(memberId: Long, memberName: String, memberAccount: String, emailAddress: String, memberAvatar: String, registerDatetime: java.sql.Timestamp, updateDatetime: java.sql.Timestamp, versionNo: Long)
   /** GetResult implicit for fetching MemberRow objects using plain SQL queries */
   implicit def GetResultMemberRow(implicit e0: GR[Long], e1: GR[String], e2: GR[java.sql.Timestamp]): GR[MemberRow] = GR{
     prs => import prs._
@@ -35,18 +35,18 @@ trait Tables {
   }
   /** Table description of table MEMBER. Objects of this class serve as prototypes for rows in queries. */
   class Member(_tableTag: Tag) extends Table[MemberRow](_tableTag, "MEMBER") {
-    def * = (memberId, memberName, emailAddress, memberAccount, memberAvatar, registerDatetime, updateDatetime, versionNo) <> (MemberRow.tupled, MemberRow.unapply)
+    def * = (memberId, memberName, memberAccount, emailAddress, memberAvatar, registerDatetime, updateDatetime, versionNo) <> (MemberRow.tupled, MemberRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(memberId), Rep.Some(memberName), Rep.Some(emailAddress), Rep.Some(memberAccount), Rep.Some(memberAvatar), Rep.Some(registerDatetime), Rep.Some(updateDatetime), Rep.Some(versionNo)).shaped.<>({r=>import r._; _1.map(_=> MemberRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get, _8.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(memberId), Rep.Some(memberName), Rep.Some(memberAccount), Rep.Some(emailAddress), Rep.Some(memberAvatar), Rep.Some(registerDatetime), Rep.Some(updateDatetime), Rep.Some(versionNo)).shaped.<>({r=>import r._; _1.map(_=> MemberRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get, _8.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column MEMBER_ID SqlType(BIGINT), AutoInc, PrimaryKey */
     val memberId: Rep[Long] = column[Long]("MEMBER_ID", O.AutoInc, O.PrimaryKey)
     /** Database column MEMBER_NAME SqlType(VARCHAR), Length(50,true) */
     val memberName: Rep[String] = column[String]("MEMBER_NAME", O.Length(50,varying=true))
-    /** Database column EMAIL_ADDRESS SqlType(VARCHAR), Length(50,true) */
-    val emailAddress: Rep[String] = column[String]("EMAIL_ADDRESS", O.Length(50,varying=true))
     /** Database column MEMBER_ACCOUNT SqlType(VARCHAR), Length(50,true) */
     val memberAccount: Rep[String] = column[String]("MEMBER_ACCOUNT", O.Length(50,varying=true))
+    /** Database column EMAIL_ADDRESS SqlType(VARCHAR), Length(50,true) */
+    val emailAddress: Rep[String] = column[String]("EMAIL_ADDRESS", O.Length(50,varying=true))
     /** Database column MEMBER_AVATAR SqlType(VARCHAR), Length(200,true) */
     val memberAvatar: Rep[String] = column[String]("MEMBER_AVATAR", O.Length(200,varying=true))
     /** Database column REGISTER_DATETIME SqlType(DATETIME) */
@@ -56,12 +56,14 @@ trait Tables {
     /** Database column VERSION_NO SqlType(BIGINT) */
     val versionNo: Rep[Long] = column[Long]("VERSION_NO")
 
+    /** Uniqueness Index over (emailAddress) (database name EMAIL_ADDRESS) */
+    val index1 = index("EMAIL_ADDRESS", emailAddress, unique=true)
     /** Index over (memberAccount) (database name IX_MEMBER_MEMBER_ACCOUNT) */
-    val index1 = index("IX_MEMBER_MEMBER_ACCOUNT", memberAccount)
+    val index2 = index("IX_MEMBER_MEMBER_ACCOUNT", memberAccount)
     /** Index over (memberName) (database name IX_MEMBER_MEMBER_NAME) */
-    val index2 = index("IX_MEMBER_MEMBER_NAME", memberName)
+    val index3 = index("IX_MEMBER_MEMBER_NAME", memberName)
     /** Uniqueness Index over (memberAccount) (database name MEMBER_ACCOUNT) */
-    val index3 = index("MEMBER_ACCOUNT", memberAccount, unique=true)
+    val index4 = index("MEMBER_ACCOUNT", memberAccount, unique=true)
   }
   /** Collection-like TableQuery object for table Member */
   lazy val Member = new TableQuery(tag => new Member(tag))
