@@ -11,12 +11,26 @@ libraryDependencies += filters
 libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % Test
 
 libraryDependencies ++= Seq(
-  "com.h2database" % "h2" % "1.4.193",
-  "com.typesafe.play" %% "play-slick" % "2.0.2"
+  "mysql" % "mysql-connector-java" % "5.1.27",
+  "com.typesafe.play" %% "play-slick" % "2.0.2",
+  "com.typesafe.slick" %% "slick-codegen" % "3.1.0"
 )
 
-// Adds additional packages into Twirl
-//TwirlKeys.templateImports += "com.example.controllers._"
+// code generation task
+slick <<= slickCodeGenTask
 
-// Adds additional packages into conf/routes
-// play.sbt.routes.RoutesKeys.routesImport += "com.example.binders._"
+sourceGenerators in Compile <+= slickCodeGenTask
+
+lazy val slick = TaskKey[Seq[File]]("gen-tables")
+lazy val slickCodeGenTask = (sourceManaged, dependencyClasspath in Compile, runner in Compile, streams) map { (dir, cp, r, s) =>
+  val outputDir = "./app"
+  val username = "root"
+  val password = ""
+  val url = "jdbc:mysql://localhost/yuitter_development"
+  val jdbcDriver = "com.mysql.jdbc.Driver"
+  val slickDriver = "slick.driver.MySQLDriver"
+  val pkg = "models"
+  toError(r.run("slick.codegen.SourceCodeGenerator", cp.files, Array(slickDriver, jdbcDriver, url, outputDir, pkg, username, password), s.log))
+  val fname = outputDir + "/" + "/models/Tables.scala"
+  Seq(file(fname))
+}
