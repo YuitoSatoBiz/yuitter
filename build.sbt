@@ -19,8 +19,6 @@ libraryDependencies ++= Seq(
 // code generation task
 slick <<= slickCodeGenTask
 
-sourceGenerators in Compile <+= slickCodeGenTask
-
 lazy val slick = TaskKey[Seq[File]]("gen-tables")
 lazy val slickCodeGenTask = (sourceManaged, dependencyClasspath in Compile, runner in Compile, streams) map { (dir, cp, r, s) =>
   val outputDir = "./app"
@@ -31,6 +29,6 @@ lazy val slickCodeGenTask = (sourceManaged, dependencyClasspath in Compile, runn
   val slickDriver = "slick.driver.MySQLDriver"
   val pkg = "models"
   toError(r.run("slick.codegen.SourceCodeGenerator", cp.files, Array(slickDriver, jdbcDriver, url, outputDir, pkg, username, password), s.log))
-  val fname = outputDir + "/" + "/models/Tables.scala"
+  val fname = outputDir + "/models/Tables.scala"
   Seq(file(fname))
 }
