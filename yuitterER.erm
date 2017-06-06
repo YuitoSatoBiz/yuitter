@@ -35,8 +35,8 @@
 		<masterDataBasePath></masterDataBasePath>
 		<use_view_object>false</use_view_object>
 		<export_settings>
-			<category_name_to_export></category_name_to_export>
-			<ddl_output></ddl_output>
+			<category_name_to_export>All</category_name_to_export>
+			<ddl_output>/yuitter/yuitterER.sql</ddl_output>
 			<excel_output></excel_output>
 			<excel_template></excel_template>
 			<image_output></image_output>
@@ -109,12 +109,12 @@
 			<physical_name>MEMBER</physical_name>
 			<logical_name>会員</logical_name>
 			<description>会員情報を保持するテーブル</description>
-			<height>210</height>
+			<height>228</height>
 			<width>284</width>
 			<font_name>.Helvetica Neue DeskInterface</font_name>
 			<font_size>9</font_size>
-			<x>283</x>
-			<y>64</y>
+			<x>338</x>
+			<y>53</y>
 			<color>
 				<r>128</r>
 				<g>128</g>
@@ -126,7 +126,7 @@
 				<normal_column>
 					<physical_name>MEMBER_ID</physical_name>
 					<logical_name>会員ID</logical_name>
-					<type>integer</type>
+					<type>bigint</type>
 					<description>登録会員のID</description>
 					<not_null>true</not_null>
 					<primary_key>true</primary_key>
@@ -247,7 +247,7 @@
 				<normal_column>
 					<physical_name>MEMBER_FOLLOWING_ID</physical_name>
 					<logical_name>会員フォローイングID</logical_name>
-					<type>integer</type>
+					<type>bigint</type>
 					<description>会員のフォロワー、フォロイーの組み合わせレコードのID</description>
 					<not_null>true</not_null>
 					<primary_key>true</primary_key>
@@ -306,8 +306,8 @@
 			<width>231</width>
 			<font_name>.Helvetica Neue DeskInterface</font_name>
 			<font_size>9</font_size>
-			<x>-2</x>
-			<y>108</y>
+			<x>10</x>
+			<y>125</y>
 			<color>
 				<r>128</r>
 				<g>128</g>
@@ -334,7 +334,7 @@
 				<normal_column>
 					<physical_name>TWEET_ID</physical_name>
 					<logical_name>ツイートID</logical_name>
-					<type>integer</type>
+					<type>bigint</type>
 					<description>ツイートID</description>
 					<not_null>true</not_null>
 					<primary_key>true</primary_key>
