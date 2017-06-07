@@ -1,7 +1,7 @@
 package models
 // AUTO-GENERATED Slick data model
 /** Stand-alone Slick data model for immediate use */
-object qTables extends {
+object Tables extends {
   val profile = slick.driver.MySQLDriver
 } with Tables
 
