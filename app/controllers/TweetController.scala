@@ -12,4 +12,6 @@ import play.api.mvc.Controller
   * @author yuito.sato
   */
 class TweetController @Inject()(val dbConfigProvider: DatabaseConfigProvider, val messagesApi: MessagesApi) extends Controller with I18nSupport {
+
+  def list = TODO
 }
