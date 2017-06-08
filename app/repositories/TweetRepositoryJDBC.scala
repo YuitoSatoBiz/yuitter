@@ -6,17 +6,18 @@ import formats.TweetWithMemberView
 import models.Tables.{Member, Tweet}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import slick.driver.JdbcProfile
 import slick.driver.MySQLDriver.api._
 
 /**
+  * TWEETテーブルに対してのクエリを生成しActionを返すクラス
+  *
   * @author yuito.sato
   */
 class TweetRepositoryJDBC @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
 
-  def listWithMember(): Future[Seq[TweetWithMemberView]] = {
-    val action = Tweet
+  def listWithMember(): DBIOAction[Seq[TweetWithMemberView], NoStream, Effect.Read] = {
+    Tweet
       .join(Member).on(_.memberId === _.memberId)
       .sortBy { case (t, m) =>
         t.registerDatetime.desc
@@ -33,6 +34,5 @@ class TweetRepositoryJDBC @Inject()(val dbConfigProvider: DatabaseConfigProvider
           )
       }
       )
-    db.run(action)
   }
 }
