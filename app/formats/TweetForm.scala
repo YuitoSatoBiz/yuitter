@@ -6,7 +6,6 @@ import play.api.libs.json.{Json, Reads}
   * Created by yuito.sato on 2017/06/09.
   */
 case class TweetForm(
-  tweetId: Option[Long],
   tweetText: String,
   versionNo: Option[Long]
 )

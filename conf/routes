@@ -4,16 +4,16 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET     /                           controllers.HomeController.index
+GET         /                             controllers.HomeController.index
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file                 controllers.Assets.versioned(path="/public", file: Asset)
 
 # Mapping to /tweet/list
-GET     /tweet/list                 controllers.TweetController.list
+GET         /tweet/list                   controllers.TweetController.list
 
 # Mapping to /tweet/create
-POST    /tweet/create               controllers.TweetController.create
+POST        /tweet/create                 controllers.TweetController.create
 
 # Mapping to /tweet/create
-POST    /tweet/update               controllers.TweetController.update
+PUT         /tweet/update/:tweetId        controllers.TweetController.update(tweetId: Long)

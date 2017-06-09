@@ -40,9 +40,9 @@ class TweetController @Inject()(val tweetService: TweetService) extends Controll
     }
   }
 
-  def update: Action[JsValue] = Action.async(parse.json) { implicit rs =>
+  def update(tweetId: Long): Action[JsValue] = Action.async(parse.json) { implicit rs =>
     rs.body.validate[TweetForm].map { form =>
-      tweetService.update(form).map { _ =>
+      tweetService.update(tweetId, form).map { _ =>
         Ok(Json.obj("result" -> "success"))
       }
     }.recoverTotal { e =>

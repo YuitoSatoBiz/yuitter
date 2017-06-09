@@ -50,9 +50,9 @@ class TweetRepositoryJDBC {
     )
   }
 
-  def update(form: TweetForm): DBIO[Int] = {
+  def update(tweetId: Long, form: TweetForm): DBIO[Int] = {
     Tweet
-      .filter(t => (t.tweetId === form.tweetId.bind) && (t.versionNo === form.versionNo) )
+      .filter(t => (t.tweetId === tweetId.bind) && (t.versionNo === form.versionNo) )
       .map(t => (t.tweetText, t.updateDatetime))
       .update(form.tweetText, Timestamp.valueOf(LocalDateTime.now))
   }
