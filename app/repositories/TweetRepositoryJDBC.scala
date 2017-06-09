@@ -1,9 +1,14 @@
 package repositories
 
-import formats.TweetWithMemberView
+import java.sql.Timestamp
+import java.time.LocalDateTime
+
+import formats.{TweetForm, TweetWithMemberView}
 import models.Tables.{Member, Tweet}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import slick.driver.MySQLDriver.api._
+import models.Tables.TweetRow
 
 /**
   * TWEETテーブルに対するクエリを生成しActionを返すクラス
@@ -31,4 +36,16 @@ class TweetRepositoryJDBC {
       })
   }
   // TODO(yuito) 自分がフォローしているユーザーを含める
+
+  def create(form: TweetForm): DBIO[Int] = {
+    Tweet += TweetRow(
+      0,
+      1,
+      // TODO(yuito) ログイン中のメンバーのIDを取得する
+      form.tweetText,
+      Timestamp.valueOf(LocalDateTime.now),
+      Timestamp.valueOf(LocalDateTime.now),
+      0
+    )
+  }
 }
