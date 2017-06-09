@@ -40,13 +40,13 @@ class TweetRepositoryJDBC {
 
   def create(form: TweetForm): DBIO[Int] = {
     Tweet += TweetRow(
-      0,
-      1,
+      tweetId = 0L,
+      memberId = 1L,
       // TODO(yuito) ログイン中のメンバーのIDを取得する
-      form.tweetText,
-      Timestamp.valueOf(LocalDateTime.now),
-      Timestamp.valueOf(LocalDateTime.now),
-      0
+      tweetText = form.tweetText,
+      registerDatetime = Timestamp.valueOf(LocalDateTime.now),
+      updateDatetime = Timestamp.valueOf(LocalDateTime.now),
+      versionNo = 0L
     )
   }
 
