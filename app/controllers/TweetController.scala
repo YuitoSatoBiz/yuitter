@@ -14,6 +14,11 @@ import services.TweetService
   */
 class TweetController @Inject()(val tweetService: TweetService) extends Controller {
 
+  /**
+    * Tweetの一覧取得 /tweet/list
+    *
+    * @return Action[AnyContent]
+    */
   def list: Action[AnyContent] = Action.async { implicit rs =>
     tweetService.list().map { tweets =>
       Ok(Json.toJson(tweets))
