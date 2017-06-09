@@ -23,4 +23,8 @@ class TweetService @Inject()(val tweetJdbc: TweetRepositoryJDBC, val dbConfigPro
   def create(form: TweetForm): Future[Int] = {
     db.run(tweetJdbc.create(form))
   }
+
+  def update(form: TweetForm): Future[Int] = {
+    db.run(tweetJdbc.update(form))
+  }
 }

@@ -20,7 +20,7 @@ class TweetRepositoryJDBC {
   def listWithMember(): DBIO[Seq[TweetWithMemberView]] = {
     Tweet
       .join(Member).on { case (t, m) => t.memberId === m.memberId }
-      .sortBy { case (t, m) =>
+      .sortBy { case (t, _) =>
         t.registerDatetime.desc
       }
       .result
@@ -35,6 +35,7 @@ class TweetRepositoryJDBC {
           )
       })
   }
+
   // TODO(yuito) 自分がフォローしているユーザーを含める
 
   def create(form: TweetForm): DBIO[Int] = {
@@ -47,5 +48,12 @@ class TweetRepositoryJDBC {
       Timestamp.valueOf(LocalDateTime.now),
       0
     )
+  }
+
+  def update(form: TweetForm): DBIO[Int] = {
+    Tweet
+      .filter(t => (t.tweetId === form.tweetId.bind) && (t.versionNo === form.versionNo) )
+      .map(t => (t.tweetText, t.updateDatetime))
+      .update(form.tweetText, Timestamp.valueOf(LocalDateTime.now))
   }
 }
