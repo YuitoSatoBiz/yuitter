@@ -13,7 +13,8 @@ libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0
 libraryDependencies ++= Seq(
   "mysql" % "mysql-connector-java" % "5.1.27",
   "com.typesafe.play" %% "play-slick" % "2.0.2",
-  "com.typesafe.slick" %% "slick-codegen" % "3.1.0"
+  "com.typesafe.slick" %% "slick-codegen" % "3.1.0",
+  "org.slf4j" % "slf4j-nop" % "1.6.4"
 )
 
 // code generation task
