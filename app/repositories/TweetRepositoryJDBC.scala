@@ -25,7 +25,7 @@ class TweetRepositoryJDBC {
             tweetId = t.tweetId,
             memberId = t.memberId,
             tweetText = t.tweetText,
-            registerDatetime = t.registerDatetime,
+            registerDatetime = t.registerDatetime.toLocalDateTime,
             memberName = m.memberName
           )
       })

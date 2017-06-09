@@ -1,5 +1,7 @@
 package formats
 
+import java.time.LocalDateTime
+
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
@@ -12,7 +14,7 @@ case class TweetWithMemberView(
   tweetId: Long,
   memberId: Long,
   tweetText: String,
-  registerDatetime: java.sql.Timestamp,
+  registerDatetime: LocalDateTime,
   memberName: String
 )
 
@@ -22,7 +24,7 @@ object TweetWithMemberView {
     (__ \ "tweetId").write[Long] and
     (__ \ "memberId").write[Long] and
     (__ \ "tweetText").write[String] and
-    (__ \ "registerDatetime").write[java.sql.Timestamp] and
+    (__ \ "registerDatetime").write[LocalDateTime] and
     (__ \ "memberName").write[String]
     ) (unlift(TweetWithMemberView.unapply))
 }
