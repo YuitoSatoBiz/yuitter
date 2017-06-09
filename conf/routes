@@ -14,3 +14,6 @@ GET     /tweet/list                 controllers.TweetController.list
 
 # Mapping to /tweet/create
 POST    /tweet/create               controllers.TweetController.create
+
+# Mapping to /tweet/create
+POST    /tweet/update               controllers.TweetController.update

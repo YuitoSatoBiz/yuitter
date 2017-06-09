@@ -35,7 +35,19 @@ class TweetController @Inject()(val tweetService: TweetService) extends Controll
       }
     }.recoverTotal { e =>
       Future {
-        BadRequest(Json.obj("result" ->"failure", "error" -> JsError.toJson(e)))
+        BadRequest(Json.obj("result" -> "failure", "error" -> JsError.toJson(e)))
+      }
+    }
+  }
+
+  def update: Action[JsValue] = Action.async(parse.json) { implicit rs =>
+    rs.body.validate[TweetForm].map { form =>
+      tweetService.update(form).map { _ =>
+        Ok(Json.obj("result" -> "success"))
+      }
+    }.recoverTotal { e =>
+      Future {
+        BadRequest(Json.obj("result" -> "failure", "error" -> JsError.toJson(e)))
       }
     }
   }
