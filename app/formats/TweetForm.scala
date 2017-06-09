@@ -7,7 +7,8 @@ import play.api.libs.json.{Json, Reads}
   */
 case class TweetForm(
   tweetId: Option[Long],
-  tweetText: String
+  tweetText: String,
+  versionNo: Option[Long]
 )
 
 object TweetForm {
