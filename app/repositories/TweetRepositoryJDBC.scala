@@ -1,12 +1,8 @@
 package repositories
 
-import javax.inject.Inject
-
 import formats.TweetWithMemberView
 import models.Tables.{Member, Tweet}
-import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import scala.concurrent.ExecutionContext.Implicits.global
-import slick.driver.JdbcProfile
 import slick.driver.MySQLDriver.api._
 
 /**
@@ -14,9 +10,9 @@ import slick.driver.MySQLDriver.api._
   *
   * @author yuito.sato
   */
-class TweetRepositoryJDBC @Inject()(val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
+class TweetRepositoryJDBC {
 
-  def listWithMember(): DBIOAction[Seq[TweetWithMemberView], NoStream, Effect.Read] = {
+  def listWithMember(): DBIO[Seq[TweetWithMemberView]] = {
     Tweet
       .join(Member).on(_.memberId === _.memberId)
       .sortBy { case (t, m) =>
