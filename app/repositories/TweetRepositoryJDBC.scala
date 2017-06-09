@@ -14,7 +14,7 @@ class TweetRepositoryJDBC {
 
   def listWithMember(): DBIO[Seq[TweetWithMemberView]] = {
     Tweet
-      .join(Member).on(_.memberId === _.memberId)
+      .join(Member).on { case (t, m) => t.memberId === m.memberId }
       .sortBy { case (t, m) =>
         t.registerDatetime.desc
       }
@@ -30,4 +30,6 @@ class TweetRepositoryJDBC {
           )
       })
   }
+
+  // TODO(yuito) 自分がフォローしているユーザーを含める
 }
