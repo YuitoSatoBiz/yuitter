@@ -28,7 +28,6 @@ class TweetRepositoryJDBC {
             registerDatetime = t.registerDatetime,
             memberName = m.memberName
           )
-      }
-      )
+      })
   }
 }
