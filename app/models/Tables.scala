@@ -23,21 +23,22 @@ trait Tables {
    *  @param memberName Database column MEMBER_NAME SqlType(VARCHAR), Length(50,true)
    *  @param memberAccount Database column MEMBER_ACCOUNT SqlType(VARCHAR), Length(50,true)
    *  @param emailAddress Database column EMAIL_ADDRESS SqlType(VARCHAR), Length(50,true)
-   *  @param memberAvatar Database column MEMBER_AVATAR SqlType(VARCHAR), Length(200,true)
+   *  @param password Database column PASSWORD SqlType(VARCHAR), Length(200,true)
+   *  @param memberAvatar Database column MEMBER_AVATAR SqlType(VARCHAR), Length(200,true), Default(None)
    *  @param registerDatetime Database column REGISTER_DATETIME SqlType(DATETIME)
    *  @param updateDatetime Database column UPDATE_DATETIME SqlType(DATETIME)
    *  @param versionNo Database column VERSION_NO SqlType(BIGINT) */
-  case class MemberRow(memberId: Long, memberName: String, memberAccount: String, emailAddress: String, memberAvatar: String, registerDatetime: java.sql.Timestamp, updateDatetime: java.sql.Timestamp, versionNo: Long)
+  case class MemberRow(memberId: Long, memberName: String, memberAccount: String, emailAddress: String, password: String, memberAvatar: Option[String] = None, registerDatetime: java.sql.Timestamp, updateDatetime: java.sql.Timestamp, versionNo: Long)
   /** GetResult implicit for fetching MemberRow objects using plain SQL queries */
-  implicit def GetResultMemberRow(implicit e0: GR[Long], e1: GR[String], e2: GR[java.sql.Timestamp]): GR[MemberRow] = GR{
+  implicit def GetResultMemberRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Option[String]], e3: GR[java.sql.Timestamp]): GR[MemberRow] = GR{
     prs => import prs._
-    MemberRow.tupled((<<[Long], <<[String], <<[String], <<[String], <<[String], <<[java.sql.Timestamp], <<[java.sql.Timestamp], <<[Long]))
+    MemberRow.tupled((<<[Long], <<[String], <<[String], <<[String], <<[String], <<?[String], <<[java.sql.Timestamp], <<[java.sql.Timestamp], <<[Long]))
   }
   /** Table description of table MEMBER. Objects of this class serve as prototypes for rows in queries. */
   class Member(_tableTag: Tag) extends Table[MemberRow](_tableTag, "MEMBER") {
-    def * = (memberId, memberName, memberAccount, emailAddress, memberAvatar, registerDatetime, updateDatetime, versionNo) <> (MemberRow.tupled, MemberRow.unapply)
+    def * = (memberId, memberName, memberAccount, emailAddress, password, memberAvatar, registerDatetime, updateDatetime, versionNo) <> (MemberRow.tupled, MemberRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(memberId), Rep.Some(memberName), Rep.Some(memberAccount), Rep.Some(emailAddress), Rep.Some(memberAvatar), Rep.Some(registerDatetime), Rep.Some(updateDatetime), Rep.Some(versionNo)).shaped.<>({r=>import r._; _1.map(_=> MemberRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get, _8.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(memberId), Rep.Some(memberName), Rep.Some(memberAccount), Rep.Some(emailAddress), Rep.Some(password), memberAvatar, Rep.Some(registerDatetime), Rep.Some(updateDatetime), Rep.Some(versionNo)).shaped.<>({r=>import r._; _1.map(_=> MemberRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6, _7.get, _8.get, _9.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column MEMBER_ID SqlType(BIGINT), AutoInc, PrimaryKey */
     val memberId: Rep[Long] = column[Long]("MEMBER_ID", O.AutoInc, O.PrimaryKey)
@@ -47,8 +48,10 @@ trait Tables {
     val memberAccount: Rep[String] = column[String]("MEMBER_ACCOUNT", O.Length(50,varying=true))
     /** Database column EMAIL_ADDRESS SqlType(VARCHAR), Length(50,true) */
     val emailAddress: Rep[String] = column[String]("EMAIL_ADDRESS", O.Length(50,varying=true))
-    /** Database column MEMBER_AVATAR SqlType(VARCHAR), Length(200,true) */
-    val memberAvatar: Rep[String] = column[String]("MEMBER_AVATAR", O.Length(200,varying=true))
+    /** Database column PASSWORD SqlType(VARCHAR), Length(200,true) */
+    val password: Rep[String] = column[String]("PASSWORD", O.Length(200,varying=true))
+    /** Database column MEMBER_AVATAR SqlType(VARCHAR), Length(200,true), Default(None) */
+    val memberAvatar: Rep[Option[String]] = column[Option[String]]("MEMBER_AVATAR", O.Length(200,varying=true), O.Default(None))
     /** Database column REGISTER_DATETIME SqlType(DATETIME) */
     val registerDatetime: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("REGISTER_DATETIME")
     /** Database column UPDATE_DATETIME SqlType(DATETIME) */
@@ -142,6 +145,9 @@ trait Tables {
 
     /** Foreign key referencing Member (database name FK_TWEET_MEMBER) */
     lazy val memberFk = foreignKey("FK_TWEET_MEMBER", memberId, Member)(r => r.memberId, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
+
+    /** Index over (tweetText) (database name IX_TWEET_TWEET_TEXT) */
+    val index1 = index("IX_TWEET_TWEET_TEXT", tweetText)
   }
   /** Collection-like TableQuery object for table Tweet */
   lazy val Tweet = new TableQuery(tag => new Tweet(tag))
