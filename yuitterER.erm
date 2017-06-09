@@ -159,6 +159,14 @@
 					<unique_key>true</unique_key>
 				</normal_column>
 				<normal_column>
+					<physical_name>PASSWORD</physical_name>
+					<logical_name>パスワード</logical_name>
+					<type>varchar(n)</type>
+					<length>200</length>
+					<description>ログインの際に必要なパスワード。ハッシュ化されてDBに保存される</description>
+					<not_null>true</not_null>
+				</normal_column>
+				<normal_column>
 					<physical_name>MEMBER_AVATAR</physical_name>
 					<logical_name>会員アバター</logical_name>
 					<type>varchar(n)</type>
@@ -365,6 +373,16 @@
 					<columns>
 						<column>
 							<column_id>table.TWEET.MEMBER_ID</column_id>
+						</column>
+					</columns>
+				</index>
+				<index>
+					<name>IX_TWEET_TWEET_TEXT</name>
+					<type>BTREE</type>
+					<non_unique>true</non_unique>
+					<columns>
+						<column>
+							<column_id>table.TWEET.TWEET_TEXT</column_id>
 						</column>
 					</columns>
 				</index>
