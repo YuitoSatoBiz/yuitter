@@ -6,7 +6,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import slick.driver.MySQLDriver.api._
 
 /**
-  * TWEETテーブルに対してのクエリを生成しActionを返すクラス
+  * TWEETテーブルに対するクエリを生成しActionを返すクラス
   *
   * @author yuito.sato
   */
