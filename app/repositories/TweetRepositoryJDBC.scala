@@ -30,6 +30,5 @@ class TweetRepositoryJDBC {
           )
       })
   }
-
   // TODO(yuito) 自分がフォローしているユーザーを含める
 }
