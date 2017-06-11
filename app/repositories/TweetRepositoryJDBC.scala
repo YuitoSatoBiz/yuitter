@@ -26,17 +26,22 @@ class TweetRepositoryJDBC {
       .result
       .map(_.map {
         case (t, m) =>
-          TweetWithMemberView(
-            tweetId = t.tweetId,
-            memberId = t.memberId,
-            tweetText = t.tweetText,
-            registerDatetime = t.registerDatetime.toLocalDateTime,
-            memberName = m.memberName
-          )
+          TweetWithMemberView.from(t, m)
       })
+    // TODO(yuitoe)自分がログインしているユーザーを含める
   }
 
-  // TODO(yuito) 自分がフォローしているユーザーを含める
+  def find(tweetId: Long): DBIO[Option[TweetWithMemberView]] = {
+    Tweet
+      .join(Member).on { case (t, m) => t.memberId === m.memberId }
+      .filter { case (t, _) => t.tweetId === tweetId }
+      .result
+      .headOption
+      .map(_.map {
+        case (t, m) =>
+          TweetWithMemberView.from(t, m)
+      })
+  }
 
   def create(form: TweetForm): DBIO[Int] = {
     Tweet += TweetRow(
@@ -52,7 +57,7 @@ class TweetRepositoryJDBC {
 
   def update(tweetId: Long, form: TweetForm): DBIO[Int] = {
     Tweet
-      .filter(t => (t.tweetId === tweetId.bind) && (t.versionNo === form.versionNo) )
+      .filter(t => (t.tweetId === tweetId.bind) && (t.versionNo === form.versionNo))
       .map(t => (t.tweetText, t.updateDatetime))
       .update(form.tweetText, Timestamp.valueOf(LocalDateTime.now))
   }

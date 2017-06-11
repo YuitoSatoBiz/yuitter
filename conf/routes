@@ -12,6 +12,9 @@ GET         /assets/*file                 controllers.Assets.versioned(path="/pu
 # Mapping to /tweet/list
 GET         /tweet/list                   controllers.TweetController.list
 
+# Mapping to /tweet/list
+GET         /tweet/find/:tweetId          controllers.TweetController.find(tweetId: Long)
+
 # Mapping to /tweet/create
 POST        /tweet/create                 controllers.TweetController.create
 

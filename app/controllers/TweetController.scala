@@ -28,6 +28,13 @@ class TweetController @Inject()(val tweetService: TweetService) extends Controll
     }
   }
 
+  def find(tweetId: Long): Action[AnyContent] = Action.async { implicit rs =>
+    tweetService.find(tweetId).map {
+      case Some(tweet) => Ok(Json.toJson(tweet))
+      case None => BadRequest(Json.obj("result" -> "failure"))
+    }
+  }
+
   def create: Action[JsValue] = Action.async(parse.json) { implicit rs =>
     rs.body.validate[TweetForm].map { form =>
       tweetService.create(form).map { _ =>

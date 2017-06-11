@@ -20,6 +20,10 @@ class TweetService @Inject()(val tweetJdbc: TweetRepositoryJDBC, val dbConfigPro
     db.run(tweetJdbc.listWithMember())
   }
 
+  def find(tweetId: Long): Future[Option[TweetWithMemberView]] = {
+    db.run(tweetJdbc.find(tweetId: Long))
+  }
+
   def create(form: TweetForm): Future[Int] = {
     db.run(tweetJdbc.create(form))
   }
