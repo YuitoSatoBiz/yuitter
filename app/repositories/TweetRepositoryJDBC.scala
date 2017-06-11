@@ -61,4 +61,10 @@ class TweetRepositoryJDBC {
       .map(t => (t.tweetText, t.updateDatetime))
       .update(form.tweetText, Timestamp.valueOf(LocalDateTime.now))
   }
+
+  def delete(tweetId: Long): DBIO[Int] = {
+    Tweet
+      .filter(_.tweetId === tweetId)
+      .delete
+  }
 }

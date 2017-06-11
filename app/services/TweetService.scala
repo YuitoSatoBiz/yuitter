@@ -31,4 +31,8 @@ class TweetService @Inject()(val tweetJdbc: TweetRepositoryJDBC, val dbConfigPro
   def update(tweetId: Long, form: TweetForm): Future[Int] = {
     db.run(tweetJdbc.update(tweetId, form))
   }
+
+  def delete(tweetId: Long): Future[Int] = {
+    db.run(tweetJdbc.delete(tweetId))
+  }
 }

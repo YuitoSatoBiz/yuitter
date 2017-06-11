@@ -20,3 +20,5 @@ POST        /tweet/create                 controllers.TweetController.create
 
 # Mapping to /tweet/create
 PUT         /tweet/update/:tweetId        controllers.TweetController.update(tweetId: Long)
+
+DELETE      /tweet/delete/:tweetId        controllers.TweetController.delete(tweetId: Long)

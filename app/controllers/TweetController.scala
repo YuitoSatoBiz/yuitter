@@ -58,4 +58,10 @@ class TweetController @Inject()(val tweetService: TweetService) extends Controll
       }
     }
   }
+
+  def delete(tweetId: Long): Action[AnyContent] = Action.async {implicit rs =>
+    tweetService.delete(tweetId).map { _ =>
+      Ok(Json.obj("result" -> "success"));
+    }
+  }
 }
