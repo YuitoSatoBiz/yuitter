@@ -28,7 +28,7 @@ class TweetRepositoryJDBC {
         case (t, m) =>
           TweetWithMemberView.from(t, m)
       })
-    // TODO(yuitoe)自分がログインしているユーザーを含める
+    // TODO(yuitoe)自分がフォローしているユーザーを含める
   }
 
   def find(tweetId: Long): DBIO[Option[TweetWithMemberView]] = {
