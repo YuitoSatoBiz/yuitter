@@ -3,7 +3,7 @@ package repositories
 import java.sql.Timestamp
 import java.time.LocalDateTime
 
-import formats.{TweetForm, TweetWithMemberView}
+import formats.{TweetCommand, TweetView}
 import models.Tables.{Member, Tweet}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -17,7 +17,7 @@ import models.Tables.TweetRow
   */
 class TweetRepositoryJDBC {
 
-  def listWithMember(): DBIO[Seq[TweetWithMemberView]] = {
+  def listWithMember(): DBIO[Seq[TweetView]] = {
     Tweet
       .join(Member).on { case (t, m) => t.memberId === m.memberId }
       .sortBy { case (t, _) =>
@@ -26,12 +26,12 @@ class TweetRepositoryJDBC {
       .result
       .map(_.map {
         case (t, m) =>
-          TweetWithMemberView.from(t, m)
+          TweetView.from(t, m)
       })
     // TODO(yuitoe)自分がフォローしているユーザーを含める
   }
 
-  def find(tweetId: Long): DBIO[Option[TweetWithMemberView]] = {
+  def find(tweetId: Long): DBIO[Option[TweetView]] = {
     Tweet
       .join(Member).on { case (t, m) => t.memberId === m.memberId }
       .filter { case (t, _) => t.tweetId === tweetId }
@@ -39,11 +39,11 @@ class TweetRepositoryJDBC {
       .headOption
       .map(_.map {
         case (t, m) =>
-          TweetWithMemberView.from(t, m)
+          TweetView.from(t, m)
       })
   }
 
-  def create(form: TweetForm): DBIO[Int] = {
+  def create(form: TweetCommand): DBIO[Int] = {
     Tweet += TweetRow(
       tweetId = 0L,
       memberId = 1L,
@@ -55,7 +55,7 @@ class TweetRepositoryJDBC {
     )
   }
 
-  def update(tweetId: Long, form: TweetForm): DBIO[Int] = {
+  def update(tweetId: Long, form: TweetCommand): DBIO[Int] = {
     Tweet
       .filter(t => (t.tweetId === tweetId.bind) && (t.versionNo === form.versionNo))
       .map(t => (t.tweetText, t.updateDatetime))

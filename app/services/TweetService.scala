@@ -2,7 +2,7 @@ package services
 
 import javax.inject.Inject
 
-import formats.{TweetForm, TweetWithMemberView}
+import formats.{TweetCommand, TweetView}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import repositories.TweetRepositoryJDBC
 
@@ -16,19 +16,19 @@ import slick.driver.JdbcProfile
   */
 class TweetService @Inject()(val tweetJdbc: TweetRepositoryJDBC, val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
 
-  def list(): Future[Seq[TweetWithMemberView]] = {
+  def list(): Future[Seq[TweetView]] = {
     db.run(tweetJdbc.listWithMember())
   }
 
-  def find(tweetId: Long): Future[Option[TweetWithMemberView]] = {
+  def find(tweetId: Long): Future[Option[TweetView]] = {
     db.run(tweetJdbc.find(tweetId: Long))
   }
 
-  def create(form: TweetForm): Future[Int] = {
+  def create(form: TweetCommand): Future[Int] = {
     db.run(tweetJdbc.create(form))
   }
 
-  def update(tweetId: Long, form: TweetForm): Future[Int] = {
+  def update(tweetId: Long, form: TweetCommand): Future[Int] = {
     db.run(tweetJdbc.update(tweetId, form))
   }
 
