@@ -21,13 +21,13 @@ trait Tables {
   /** Entity class storing rows of table Account
    *  @param accountId Database column ACCOUNT_ID SqlType(BIGINT), AutoInc, PrimaryKey
    *  @param memberId Database column MEMBER_ID SqlType(BIGINT)
-   *  @param accountname Database column ACCOUNTNAME SqlType(VARCHAR), Length(50,true)
+   *  @param accountName Database column ACCOUNT_NAME SqlType(VARCHAR), Length(50,true)
    *  @param avatar Database column AVATAR SqlType(VARCHAR), Length(200,true), Default(None)
    *  @param backgroundImage Database column BACKGROUND_IMAGE SqlType(VARCHAR), Length(200,true), Default(None)
    *  @param registerDatetime Database column REGISTER_DATETIME SqlType(DATETIME)
    *  @param updateDatetime Database column UPDATE_DATETIME SqlType(DATETIME)
    *  @param versionNo Database column VERSION_NO SqlType(BIGINT) */
-  case class AccountRow(accountId: Long, memberId: Long, accountname: String, avatar: Option[String] = None, backgroundImage: Option[String] = None, registerDatetime: java.sql.Timestamp, updateDatetime: java.sql.Timestamp, versionNo: Long)
+  case class AccountRow(accountId: Long, memberId: Long, accountName: String, avatar: Option[String] = None, backgroundImage: Option[String] = None, registerDatetime: java.sql.Timestamp, updateDatetime: java.sql.Timestamp, versionNo: Long)
   /** GetResult implicit for fetching AccountRow objects using plain SQL queries */
   implicit def GetResultAccountRow(implicit e0: GR[Long], e1: GR[String], e2: GR[Option[String]], e3: GR[java.sql.Timestamp]): GR[AccountRow] = GR{
     prs => import prs._
@@ -35,16 +35,16 @@ trait Tables {
   }
   /** Table description of table ACCOUNT. Objects of this class serve as prototypes for rows in queries. */
   class Account(_tableTag: Tag) extends Table[AccountRow](_tableTag, "ACCOUNT") {
-    def * = (accountId, memberId, accountname, avatar, backgroundImage, registerDatetime, updateDatetime, versionNo) <> (AccountRow.tupled, AccountRow.unapply)
+    def * = (accountId, memberId, accountName, avatar, backgroundImage, registerDatetime, updateDatetime, versionNo) <> (AccountRow.tupled, AccountRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(accountId), Rep.Some(memberId), Rep.Some(accountname), avatar, backgroundImage, Rep.Some(registerDatetime), Rep.Some(updateDatetime), Rep.Some(versionNo)).shaped.<>({r=>import r._; _1.map(_=> AccountRow.tupled((_1.get, _2.get, _3.get, _4, _5, _6.get, _7.get, _8.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(accountId), Rep.Some(memberId), Rep.Some(accountName), avatar, backgroundImage, Rep.Some(registerDatetime), Rep.Some(updateDatetime), Rep.Some(versionNo)).shaped.<>({r=>import r._; _1.map(_=> AccountRow.tupled((_1.get, _2.get, _3.get, _4, _5, _6.get, _7.get, _8.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column ACCOUNT_ID SqlType(BIGINT), AutoInc, PrimaryKey */
     val accountId: Rep[Long] = column[Long]("ACCOUNT_ID", O.AutoInc, O.PrimaryKey)
     /** Database column MEMBER_ID SqlType(BIGINT) */
     val memberId: Rep[Long] = column[Long]("MEMBER_ID")
-    /** Database column ACCOUNTNAME SqlType(VARCHAR), Length(50,true) */
-    val accountname: Rep[String] = column[String]("ACCOUNTNAME", O.Length(50,varying=true))
+    /** Database column ACCOUNT_NAME SqlType(VARCHAR), Length(50,true) */
+    val accountName: Rep[String] = column[String]("ACCOUNT_NAME", O.Length(50,varying=true))
     /** Database column AVATAR SqlType(VARCHAR), Length(200,true), Default(None) */
     val avatar: Rep[Option[String]] = column[Option[String]]("AVATAR", O.Length(200,varying=true), O.Default(None))
     /** Database column BACKGROUND_IMAGE SqlType(VARCHAR), Length(200,true), Default(None) */

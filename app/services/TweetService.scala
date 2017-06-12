@@ -17,7 +17,7 @@ import slick.driver.JdbcProfile
 class TweetService @Inject()(val tweetJdbc: TweetRepositoryJDBC, val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
 
   def list(): Future[Seq[TweetView]] = {
-    db.run(tweetJdbc.listWithMember())
+    db.run(tweetJdbc.list())
   }
 
   def find(tweetId: Long): Future[Option[TweetView]] = {

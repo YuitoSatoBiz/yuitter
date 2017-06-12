@@ -12,24 +12,22 @@ import play.api.libs.json._
   */
 case class TweetView(
   tweetId: Long,
-  memberId: Long,
   tweetText: String,
   registerDatetime: LocalDateTime,
   versionNo: Long,
-  memberName: String
+  accounts: Seq[AccountView]
 )
 
 object TweetView {
 
   implicit val tweetViewWrites: OWrites[TweetView] = Json.writes[TweetView]
 
-  def from(t: Tweet#TableElementType, m: Member#TableElementType): TweetView =
+  def from(t: Tweet#TableElementType, aList: Seq[AccountView]): TweetView =
     TweetView(
       tweetId = t.tweetId,
-      memberId = t.memberId,
       tweetText = t.tweetText,
       registerDatetime = t.registerDatetime.toLocalDateTime,
       versionNo = t.versionNo,
-      memberName = m.memberName
+      accounts = aList
     )
 }
