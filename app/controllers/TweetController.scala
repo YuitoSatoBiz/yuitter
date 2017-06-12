@@ -52,9 +52,9 @@ class TweetController @Inject()(val tweetService: TweetService) extends Controll
         Ok(Json.obj("result" -> "success"))
       }
     }.recoverTotal { e =>
-      Future {
+      Future.successful(
         BadRequest(Json.obj("result" -> "failure", "error" -> JsError.toJson(e)))
-      }
+      )
     }
   }
 
@@ -70,9 +70,9 @@ class TweetController @Inject()(val tweetService: TweetService) extends Controll
         Ok(Json.obj("result" -> "success"))
       }
     }.recoverTotal { e =>
-      Future {
+      Future.successful(
         BadRequest(Json.obj("result" -> "failure", "error" -> JsError.toJson(e)))
-      }
+      )
     }
   }
 
