@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject.Inject
 
-import formats.TweetForm
+import formats.TweetCommand
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent, Controller}
@@ -47,15 +47,18 @@ class TweetController @Inject()(val tweetService: TweetService) extends Controll
     * @return Action[JsValue]
     */
   def create: Action[JsValue] = Action.async(parse.json) { implicit rs =>
-    rs.body.validate[TweetForm].map { form =>
-      tweetService.create(form).map { _ =>
-        Ok(Json.obj("result" -> "success"))
+    rs.body.validate[TweetCommand].fold(
+      invalid = { e =>
+        Future.successful(
+          BadRequest(Json.obj("result" -> "failure", "error" -> JsError.toJson(e)))
+        )
+      },
+      valid = { form =>
+        tweetService.create(form).map { _ =>
+          Ok(Json.obj("result" -> "success"))
+        }
       }
-    }.recoverTotal { e =>
-      Future.successful(
-        BadRequest(Json.obj("result" -> "failure", "error" -> JsError.toJson(e)))
-      )
-    }
+    )
   }
 
   /**
@@ -65,15 +68,18 @@ class TweetController @Inject()(val tweetService: TweetService) extends Controll
     * @return Action[JsValue]
     */
   def update(tweetId: Long): Action[JsValue] = Action.async(parse.json) { implicit rs =>
-    rs.body.validate[TweetForm].map { form =>
-      tweetService.update(tweetId, form).map { _ =>
-        Ok(Json.obj("result" -> "success"))
+    rs.body.validate[TweetCommand].fold(
+      invalid = { e =>
+        Future.successful(
+          BadRequest(Json.obj("result" -> "failure", "error" -> JsError.toJson(e)))
+        )
+      },
+      valid = { form =>
+        tweetService.update(tweetId, form).map { _ =>
+          Ok(Json.obj("result" -> "success"))
+        }
       }
-    }.recoverTotal { e =>
-      Future.successful(
-        BadRequest(Json.obj("result" -> "failure", "error" -> JsError.toJson(e)))
-      )
-    }
+    )
   }
 
   /**
