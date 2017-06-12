@@ -106,15 +106,312 @@
 	</tablespace_set>
 	<diagram_walkers>
 		<table>
+			<physical_name>ACCOUNT</physical_name>
+			<logical_name>アカウント</logical_name>
+			<description></description>
+			<height>162</height>
+			<width>240</width>
+			<font_name>.Helvetica Neue DeskInterface</font_name>
+			<font_size>9</font_size>
+			<x>780</x>
+			<y>389</y>
+			<color>
+				<r>128</r>
+				<g>128</g>
+				<b>192</b>
+			</color>
+			<connections>
+				<relationship>
+					<name>FK_ACCOUNT_MEMBER</name>
+					<source>table.MEMBER</source>
+					<target>table.ACCOUNT</target>
+					<fk_columns>
+						<fk_column>
+							<fk_column_name>MEMBER_ID</fk_column_name>
+						</fk_column>
+					</fk_columns>
+					<parent_cardinality>1</parent_cardinality>
+					<child_cardinality>0..n</child_cardinality>
+					<reference_for_pk>true</reference_for_pk>
+					<on_delete_action>RESTRICT</on_delete_action>
+					<on_update_action>RESTRICT</on_update_action>
+				</relationship>
+			</connections>
+			<columns>
+				<normal_column>
+					<physical_name>ACCOUNT_ID</physical_name>
+					<logical_name>アカウントID</logical_name>
+					<type>bigint</type>
+					<description>登録アカウントのID。MEMBERは複数のACCOUNTを保持することができる。</description>
+					<not_null>true</not_null>
+					<primary_key>true</primary_key>
+					<auto_increment>true</auto_increment>
+				</normal_column>
+				<normal_column>
+					<physical_name>MEMBER_ID</physical_name>
+					<referred_column>table.MEMBER.MEMBER_ID</referred_column>
+					<relationship>FK_ACCOUNT_MEMBER</relationship>
+					<description>登録会員のID&#x0A;</description>
+					<not_null>true</not_null>
+				</normal_column>
+				<normal_column>
+					<physical_name>AccountName</physical_name>
+					<logical_name>アカウント名</logical_name>
+					<type>varchar(n)</type>
+					<length>50</length>
+					<description>登録アカウントの名前</description>
+					<not_null>true</not_null>
+				</normal_column>
+				<normal_column>
+					<physical_name>AVATAR</physical_name>
+					<logical_name>アバター</logical_name>
+					<type>varchar(n)</type>
+					<length>200</length>
+					<description>アカウントのアバター</description>
+				</normal_column>
+				<column_group>COMMON_COLUMNS</column_group>
+			</columns>
+			<indexes>
+				<index>
+					<name>IX_ACCOUNT_ACCOUNT_ID</name>
+					<type>BTREE</type>
+					<non_unique>true</non_unique>
+					<columns>
+						<column>
+							<column_id>table.ACCOUNT.ACCOUNT_ID</column_id>
+						</column>
+					</columns>
+				</index>
+				<index>
+					<name>IX_ACCOUNT_MEMBER_ID</name>
+					<type>BTREE</type>
+					<non_unique>true</non_unique>
+					<columns>
+						<column>
+							<column_id>table.ACCOUNT.MEMBER_ID</column_id>
+						</column>
+					</columns>
+				</index>
+			</indexes>
+			<compound_unique_key_list>
+			</compound_unique_key_list>
+			<table_properties>
+			</table_properties>
+		</table>
+		<table>
+			<physical_name>ACCOUNT_FOLLOWING</physical_name>
+			<logical_name>アカウントフォローイング</logical_name>
+			<description></description>
+			<height>192</height>
+			<width>367</width>
+			<font_name>.Helvetica Neue DeskInterface</font_name>
+			<font_size>9</font_size>
+			<x>315</x>
+			<y>387</y>
+			<color>
+				<r>128</r>
+				<g>128</g>
+				<b>192</b>
+			</color>
+			<connections>
+				<relationship>
+					<name>FK_FOLLOWER_ACCOUNT</name>
+					<source>table.ACCOUNT</source>
+					<target>table.ACCOUNT_FOLLOWING</target>
+					<fk_columns>
+						<fk_column>
+							<fk_column_name>FOLLOWER_ID</fk_column_name>
+						</fk_column>
+					</fk_columns>
+					<parent_cardinality>1</parent_cardinality>
+					<child_cardinality>0..n</child_cardinality>
+					<reference_for_pk>true</reference_for_pk>
+					<on_delete_action>RESTRICT</on_delete_action>
+					<on_update_action>RESTRICT</on_update_action>
+				</relationship>
+				<relationship>
+					<name>FK_ACCOUNT_FOLLOWEE_ACCOUNT</name>
+					<source>table.ACCOUNT</source>
+					<target>table.ACCOUNT_FOLLOWING</target>
+					<fk_columns>
+						<fk_column>
+							<fk_column_name>FOLLOWEE_ID</fk_column_name>
+						</fk_column>
+					</fk_columns>
+					<parent_cardinality>1</parent_cardinality>
+					<child_cardinality>0..n</child_cardinality>
+					<reference_for_pk>true</reference_for_pk>
+					<on_delete_action>RESTRICT</on_delete_action>
+					<on_update_action>RESTRICT</on_update_action>
+					<target_xp>100</target_xp>
+					<target_yp>67</target_yp>
+				</relationship>
+			</connections>
+			<columns>
+				<normal_column>
+					<physical_name>MEMBER_FOLLOWING_ID</physical_name>
+					<logical_name>会員フォローイングID</logical_name>
+					<type>bigint</type>
+					<description>会員のフォロワー、フォロイーの組み合わせレコードのID</description>
+					<not_null>true</not_null>
+					<primary_key>true</primary_key>
+					<auto_increment>true</auto_increment>
+				</normal_column>
+				<normal_column>
+					<physical_name>FOLLOWER_ID</physical_name>
+					<logical_name>フォロワーID</logical_name>
+					<referred_column>table.ACCOUNT.ACCOUNT_ID</referred_column>
+					<relationship>FK_FOLLOWER_ACCOUNT</relationship>
+					<description>フォローしている人のID</description>
+					<not_null>true</not_null>
+				</normal_column>
+				<normal_column>
+					<physical_name>FOLLOWEE_ID</physical_name>
+					<logical_name>フォロイーID</logical_name>
+					<referred_column>table.ACCOUNT.ACCOUNT_ID</referred_column>
+					<relationship>FK_ACCOUNT_FOLLOWEE_ACCOUNT</relationship>
+					<description>フォローされている人のID</description>
+					<not_null>true</not_null>
+				</normal_column>
+				<column_group>COMMON_COLUMNS</column_group>
+			</columns>
+			<indexes>
+				<index>
+					<name>IX_ACCOUNT_FOLLOWING_FOLLOWER_ID</name>
+					<type>BTREE</type>
+					<non_unique>true</non_unique>
+					<columns>
+						<column>
+							<column_id>table.ACCOUNT_FOLLOWING.FOLLOWER_ID</column_id>
+						</column>
+					</columns>
+				</index>
+				<index>
+					<name>IX_ACCOUNT_FOLLOWING_FOLLOWEE</name>
+					<type>BTREE</type>
+					<non_unique>true</non_unique>
+					<columns>
+						<column>
+							<column_id>table.ACCOUNT_FOLLOWING.FOLLOWEE_ID</column_id>
+						</column>
+					</columns>
+				</index>
+			</indexes>
+			<compound_unique_key_list>
+			</compound_unique_key_list>
+			<table_properties>
+			</table_properties>
+		</table>
+		<table>
+			<physical_name>ACCOUNT_TWEET</physical_name>
+			<logical_name>アカウントツイート</logical_name>
+			<description></description>
+			<height>225</height>
+			<width>293</width>
+			<font_name>.Helvetica Neue DeskInterface</font_name>
+			<font_size>9</font_size>
+			<x>762</x>
+			<y>672</y>
+			<color>
+				<r>128</r>
+				<g>128</g>
+				<b>192</b>
+			</color>
+			<connections>
+				<relationship>
+					<name>FK_ACCOUNT_TWEET_Account</name>
+					<source>table.ACCOUNT</source>
+					<target>table.ACCOUNT_TWEET</target>
+					<fk_columns>
+						<fk_column>
+							<fk_column_name>ACCOUNT_ID</fk_column_name>
+						</fk_column>
+					</fk_columns>
+					<parent_cardinality>1</parent_cardinality>
+					<child_cardinality>0..n</child_cardinality>
+					<reference_for_pk>true</reference_for_pk>
+					<on_delete_action>RESTRICT</on_delete_action>
+					<on_update_action>RESTRICT</on_update_action>
+				</relationship>
+				<relationship>
+					<name>FK_ACCOUNT_TWEET_TWEET</name>
+					<source>table.TWEET</source>
+					<target>table.ACCOUNT_TWEET</target>
+					<fk_columns>
+						<fk_column>
+							<fk_column_name>TWEET_ID</fk_column_name>
+						</fk_column>
+					</fk_columns>
+					<parent_cardinality>1</parent_cardinality>
+					<child_cardinality>0..n</child_cardinality>
+					<reference_for_pk>true</reference_for_pk>
+					<on_delete_action>RESTRICT</on_delete_action>
+					<on_update_action>RESTRICT</on_update_action>
+				</relationship>
+			</connections>
+			<columns>
+				<normal_column>
+					<physical_name>ACCOUNT_TWEET_ID</physical_name>
+					<logical_name>アカウントツイートID</logical_name>
+					<type>bigint</type>
+					<description>アカウントツイートID</description>
+					<not_null>true</not_null>
+					<primary_key>true</primary_key>
+					<auto_increment>true</auto_increment>
+				</normal_column>
+				<normal_column>
+					<physical_name>ACCOUNT_ID</physical_name>
+					<referred_column>table.ACCOUNT.ACCOUNT_ID</referred_column>
+					<relationship>FK_ACCOUNT_TWEET_Account</relationship>
+					<description>登録アカウントのID</description>
+					<not_null>true</not_null>
+				</normal_column>
+				<normal_column>
+					<physical_name>TWEET_ID</physical_name>
+					<referred_column>table.TWEET.TWEET_ID</referred_column>
+					<relationship>FK_ACCOUNT_TWEET_TWEET</relationship>
+					<description>登録ツイートのID</description>
+					<not_null>true</not_null>
+				</normal_column>
+				<column_group>COMMON_COLUMNS</column_group>
+			</columns>
+			<indexes>
+				<index>
+					<name>IX_ACCOUNT_TWEET_ACCOUNT_ID</name>
+					<type>BTREE</type>
+					<non_unique>true</non_unique>
+					<columns>
+						<column>
+							<column_id>table.ACCOUNT_TWEET.ACCOUNT_ID</column_id>
+						</column>
+					</columns>
+				</index>
+				<index>
+					<name>IX_ACCOUNT_TWEET_TWEET_ID</name>
+					<type>BTREE</type>
+					<non_unique>true</non_unique>
+					<columns>
+						<column>
+							<column_id>table.ACCOUNT_TWEET.TWEET_ID</column_id>
+						</column>
+					</columns>
+				</index>
+			</indexes>
+			<compound_unique_key_list>
+			</compound_unique_key_list>
+			<table_properties>
+			</table_properties>
+		</table>
+		<table>
 			<physical_name>MEMBER</physical_name>
 			<logical_name>会員</logical_name>
 			<description>会員情報を保持するテーブル</description>
-			<height>228</height>
+			<height>179</height>
 			<width>284</width>
 			<font_name>.Helvetica Neue DeskInterface</font_name>
 			<font_size>9</font_size>
-			<x>338</x>
-			<y>53</y>
+			<x>756</x>
+			<y>152</y>
 			<color>
 				<r>128</r>
 				<g>128</g>
@@ -133,23 +430,6 @@
 					<auto_increment>true</auto_increment>
 				</normal_column>
 				<normal_column>
-					<physical_name>MEMBER_NAME</physical_name>
-					<logical_name>会員名称</logical_name>
-					<type>varchar(n)</type>
-					<length>50</length>
-					<description>会員の名称。ニックネームでも可。</description>
-					<not_null>true</not_null>
-				</normal_column>
-				<normal_column>
-					<physical_name>MEMBER_ACCOUNT</physical_name>
-					<logical_name>会員アカウント</logical_name>
-					<type>varchar(n)</type>
-					<length>50</length>
-					<description>会員レコードの識別子。</description>
-					<not_null>true</not_null>
-					<unique_key>true</unique_key>
-				</normal_column>
-				<normal_column>
 					<physical_name>EMAIL_ADDRESS</physical_name>
 					<logical_name>Emailアドレス</logical_name>
 					<type>varchar(n)</type>
@@ -161,142 +441,21 @@
 				<normal_column>
 					<physical_name>PASSWORD</physical_name>
 					<logical_name>パスワード</logical_name>
-					<type>varchar(n)</type>
-					<length>200</length>
-					<description>ログインの際に必要なパスワード。ハッシュ化されてDBに保存される</description>
-					<not_null>true</not_null>
-				</normal_column>
-				<normal_column>
-					<physical_name>MEMBER_AVATAR</physical_name>
-					<logical_name>会員アバター</logical_name>
-					<type>varchar(n)</type>
-					<length>200</length>
-					<description>会員のプロフィール画像</description>
-				</normal_column>
-				<column_group>COMMON_COLUMNS</column_group>
-			</columns>
-			<indexes>
-				<index>
-					<name>IX_MEMBER_MEMBER_NAME</name>
-					<type>BTREE</type>
-					<description>会員名での検索のためのインデックス</description>
-					<non_unique>true</non_unique>
-					<columns>
-						<column>
-							<column_id>table.MEMBER.MEMBER_NAME</column_id>
-						</column>
-					</columns>
-				</index>
-				<index>
-					<name>IX_MEMBER_MEMBER_ACCOUNT</name>
-					<type>BTREE</type>
-					<description>メンバーアカウントで検索するためのインデックス</description>
-					<non_unique>true</non_unique>
-					<columns>
-						<column>
-							<column_id>table.MEMBER.MEMBER_ACCOUNT</column_id>
-						</column>
-					</columns>
-				</index>
-			</indexes>
-			<compound_unique_key_list>
-			</compound_unique_key_list>
-			<table_properties>
-			</table_properties>
-		</table>
-		<table>
-			<physical_name>MEMBER_FOLLOWING</physical_name>
-			<logical_name>会員フォローイング</logical_name>
-			<description></description>
-			<height>192</height>
-			<width>321</width>
-			<font_name>.Helvetica Neue DeskInterface</font_name>
-			<font_size>9</font_size>
-			<x>51</x>
-			<y>383</y>
-			<color>
-				<r>128</r>
-				<g>128</g>
-				<b>192</b>
-			</color>
-			<connections>
-				<relationship>
-					<name>FK_MEMBER_FOLLOWER</name>
-					<source>table.MEMBER</source>
-					<target>table.MEMBER_FOLLOWING</target>
-					<fk_columns>
-						<fk_column>
-							<fk_column_name>FOLLOWER_ID</fk_column_name>
-						</fk_column>
-					</fk_columns>
-					<parent_cardinality>1</parent_cardinality>
-					<child_cardinality>0..n</child_cardinality>
-					<reference_for_pk>true</reference_for_pk>
-					<on_delete_action>RESTRICT</on_delete_action>
-					<on_update_action>RESTRICT</on_update_action>
-				</relationship>
-				<relationship>
-					<name>FK_MEMBER_FOLLOWEE</name>
-					<source>table.MEMBER</source>
-					<target>table.MEMBER_FOLLOWING</target>
-					<fk_columns>
-						<fk_column>
-							<fk_column_name>FOLLOWEE_ID</fk_column_name>
-						</fk_column>
-					</fk_columns>
-					<parent_cardinality>1</parent_cardinality>
-					<child_cardinality>0..n</child_cardinality>
-					<reference_for_pk>true</reference_for_pk>
-					<on_delete_action>RESTRICT</on_delete_action>
-					<on_update_action>RESTRICT</on_update_action>
-				</relationship>
-			</connections>
-			<columns>
-				<normal_column>
-					<physical_name>MEMBER_FOLLOWING_ID</physical_name>
-					<logical_name>会員フォローイングID</logical_name>
-					<type>bigint</type>
-					<description>会員のフォロワー、フォロイーの組み合わせレコードのID</description>
-					<not_null>true</not_null>
-					<primary_key>true</primary_key>
-					<auto_increment>true</auto_increment>
-				</normal_column>
-				<normal_column>
-					<physical_name>FOLLOWER_ID</physical_name>
-					<logical_name>フォロワーID</logical_name>
-					<referred_column>table.MEMBER.MEMBER_ID</referred_column>
-					<relationship>FK_MEMBER_FOLLOWER</relationship>
-					<description>フォローをしている会員のID</description>
-					<not_null>true</not_null>
-				</normal_column>
-				<normal_column>
-					<physical_name>FOLLOWEE_ID</physical_name>
-					<logical_name>フォロイーID</logical_name>
-					<referred_column>table.MEMBER.MEMBER_ID</referred_column>
-					<relationship>FK_MEMBER_FOLLOWEE</relationship>
-					<description>フォローされる会員のID</description>
+					<type>character(n)</type>
+					<length>60</length>
+					<description>ログインの際に必要なパスワード。ハッシュ化されてDBに保存される&#x0A;BCryptによるハッシュ化を行う</description>
 					<not_null>true</not_null>
 				</normal_column>
 				<column_group>COMMON_COLUMNS</column_group>
 			</columns>
 			<indexes>
 				<index>
-					<name>IX_MEMBER_FOLLOWING_FOLLOWER_ID</name>
+					<name>IX_MEMBER_MEMBER_ID</name>
 					<type>BTREE</type>
 					<non_unique>true</non_unique>
 					<columns>
 						<column>
-							<column_id>table.MEMBER_FOLLOWING.FOLLOWER_ID</column_id>
-						</column>
-					</columns>
-				</index>
-				<index>
-					<name>IX_MEMBER_FOLLOWING_FOLLOWEE_ID</name>
-					<type>BTREE</type>
-					<non_unique>true</non_unique>
-					<columns>
-						<column>
-							<column_id>table.MEMBER_FOLLOWING.FOLLOWEE_ID</column_id>
+							<column_id>table.MEMBER.MEMBER_ID</column_id>
 						</column>
 					</columns>
 				</index>
@@ -310,33 +469,18 @@
 			<physical_name>TWEET</physical_name>
 			<logical_name>ツイート</logical_name>
 			<description></description>
-			<height>180</height>
+			<height>192</height>
 			<width>231</width>
 			<font_name>.Helvetica Neue DeskInterface</font_name>
 			<font_size>9</font_size>
-			<x>10</x>
-			<y>125</y>
+			<x>1097</x>
+			<y>398</y>
 			<color>
 				<r>128</r>
 				<g>128</g>
 				<b>192</b>
 			</color>
 			<connections>
-				<relationship>
-					<name>FK_TWEET_MEMBER</name>
-					<source>table.MEMBER</source>
-					<target>table.TWEET</target>
-					<fk_columns>
-						<fk_column>
-							<fk_column_name>MEMBER_ID</fk_column_name>
-						</fk_column>
-					</fk_columns>
-					<parent_cardinality>1</parent_cardinality>
-					<child_cardinality>0..n</child_cardinality>
-					<reference_for_pk>true</reference_for_pk>
-					<on_delete_action>RESTRICT</on_delete_action>
-					<on_update_action>RESTRICT</on_update_action>
-				</relationship>
 			</connections>
 			<columns>
 				<normal_column>
@@ -347,12 +491,6 @@
 					<not_null>true</not_null>
 					<primary_key>true</primary_key>
 					<auto_increment>true</auto_increment>
-				</normal_column>
-				<normal_column>
-					<physical_name>MEMBER_ID</physical_name>
-					<referred_column>table.MEMBER.MEMBER_ID</referred_column>
-					<relationship>FK_TWEET_MEMBER</relationship>
-					<not_null>true</not_null>
 				</normal_column>
 				<normal_column>
 					<physical_name>TWEET_TEXT</physical_name>
@@ -366,22 +504,12 @@
 			</columns>
 			<indexes>
 				<index>
-					<name>IX_TWEET_MEMBER_ID</name>
+					<name>IX_TWEET_TWEET_ID</name>
 					<type>BTREE</type>
 					<non_unique>true</non_unique>
 					<columns>
 						<column>
-							<column_id>table.TWEET.MEMBER_ID</column_id>
-						</column>
-					</columns>
-				</index>
-				<index>
-					<name>IX_TWEET_TWEET_TEXT</name>
-					<type>BTREE</type>
-					<non_unique>true</non_unique>
-					<columns>
-						<column>
-							<column_id>table.TWEET.TWEET_TEXT</column_id>
+							<column_id>table.TWEET.TWEET_ID</column_id>
 						</column>
 					</columns>
 				</index>
