@@ -172,7 +172,6 @@
 					<type>varchar(n)</type>
 					<length>200</length>
 					<description>会員のプロフィール画像</description>
-					<not_null>true</not_null>
 				</normal_column>
 				<column_group>COMMON_COLUMNS</column_group>
 			</columns>
