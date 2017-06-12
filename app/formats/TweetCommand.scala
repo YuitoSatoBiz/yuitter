@@ -7,12 +7,12 @@ import play.api.libs.json.{Json, Reads}
   *
   * @author yuito.sato
   */
-case class TweetForm(
+case class TweetCommand(
   tweetText: String,
   versionNo: Option[Long]
 )
 
-object TweetForm {
+object TweetCommand {
 
-  implicit val TweetFormReads: Reads[TweetForm] = Json.reads[TweetForm]
+  implicit val TweetCommandReads: Reads[TweetCommand] = Json.reads[TweetCommand]
 }

@@ -10,7 +10,7 @@ import play.api.libs.json._
   *
   * @author yuito.sato
   */
-case class TweetWithMemberView(
+case class TweetView(
   tweetId: Long,
   memberId: Long,
   tweetText: String,
@@ -19,12 +19,12 @@ case class TweetWithMemberView(
   memberName: String
 )
 
-object TweetWithMemberView {
+object TweetView {
 
-  implicit val tweetWithMemberViewWrites: OWrites[TweetWithMemberView] = Json.writes[TweetWithMemberView]
+  implicit val tweetViewWrites: OWrites[TweetView] = Json.writes[TweetView]
 
-  def from(t: Tweet#TableElementType, m: Member#TableElementType): TweetWithMemberView =
-    TweetWithMemberView(
+  def from(t: Tweet#TableElementType, m: Member#TableElementType): TweetView =
+    TweetView(
       tweetId = t.tweetId,
       memberId = t.memberId,
       tweetText = t.tweetText,
