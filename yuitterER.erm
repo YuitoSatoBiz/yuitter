@@ -169,6 +169,13 @@
 					<length>200</length>
 					<description>アカウントのアバター</description>
 				</normal_column>
+				<normal_column>
+					<physical_name>BACKGROUND_IMAGE</physical_name>
+					<logical_name>背景画像</logical_name>
+					<type>varchar(n)</type>
+					<length>200</length>
+					<description>プロフィール画面の背景画像&#x0A;</description>
+				</normal_column>
 				<column_group>COMMON_COLUMNS</column_group>
 			</columns>
 			<indexes>
