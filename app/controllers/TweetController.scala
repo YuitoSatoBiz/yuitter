@@ -18,7 +18,7 @@ import scala.concurrent.Future
 class TweetController @Inject()(val tweetService: TweetService) extends Controller {
 
   /**
-    * Tweetの一覧取得 /tweet/list
+    * Tweetの一覧取得 GET /tweets
     *
     * @return Action[AnyContent]
     */
@@ -28,6 +28,12 @@ class TweetController @Inject()(val tweetService: TweetService) extends Controll
     }
   }
 
+  /**
+    * TweetをtweetIdで検索 GET /tweets/:tweetId
+    *
+    * @param tweetId 検索するツイートのID
+    * @return Action[AnyContent]
+    */
   def find(tweetId: Long): Action[AnyContent] = Action.async { implicit rs =>
     tweetService.find(tweetId).map {
       case Some(tweet) => Ok(Json.toJson(tweet))
@@ -35,6 +41,11 @@ class TweetController @Inject()(val tweetService: TweetService) extends Controll
     }
   }
 
+  /**
+    * Tweetを作成 POST /tweets
+    *
+    * @return Action[JsValue]
+    */
   def create: Action[JsValue] = Action.async(parse.json) { implicit rs =>
     rs.body.validate[TweetForm].map { form =>
       tweetService.create(form).map { _ =>
@@ -47,6 +58,12 @@ class TweetController @Inject()(val tweetService: TweetService) extends Controll
     }
   }
 
+  /**
+    * Tweetを更新 PUT /tweets/:tweetId
+    *
+    * @param tweetId 更新するツイートのID
+    * @return Action[JsValue]
+    */
   def update(tweetId: Long): Action[JsValue] = Action.async(parse.json) { implicit rs =>
     rs.body.validate[TweetForm].map { form =>
       tweetService.update(tweetId, form).map { _ =>
@@ -59,7 +76,13 @@ class TweetController @Inject()(val tweetService: TweetService) extends Controll
     }
   }
 
-  def delete(tweetId: Long): Action[AnyContent] = Action.async {implicit rs =>
+  /**
+    * Tweetを削除 DELETE /tweets/:tweetId
+    *
+    * @param tweetId 削除するツイートのID
+    * @return
+    */
+  def delete(tweetId: Long): Action[AnyContent] = Action.async { implicit rs =>
     tweetService.delete(tweetId).map { _ =>
       Ok(Json.obj("result" -> "success"));
     }
