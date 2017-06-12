@@ -3,7 +3,9 @@ package formats
 import play.api.libs.json.{Json, Reads}
 
 /**
-  * Created by yuito.sato on 2017/06/09.
+  * Tweetテーブルに関するフォームのケースクラス
+  *
+  * @author yuito.sato
   */
 case class TweetForm(
   tweetText: String,
