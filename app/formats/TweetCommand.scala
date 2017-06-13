@@ -10,7 +10,7 @@ import play.api.libs.json.{Json, Reads}
 case class TweetCommand(
   tweetText: String,
   versionNo: Option[Long],
-  accountIds: Seq[Long]
+  accountIds: Option[Seq[Long]]
 )
 
 object TweetCommand {

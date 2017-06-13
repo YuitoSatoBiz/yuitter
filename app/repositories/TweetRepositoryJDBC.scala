@@ -72,7 +72,7 @@ class TweetRepositoryJDBC {
         updateDatetime = Timestamp.valueOf(LocalDateTime.now),
         versionNo = 0L
       )
-      b <- AccountTweet ++= form.accountIds.map { aid =>
+      b <- AccountTweet ++= form.accountIds.get.map { aid =>
         AccountTweetRow(
           accountTweetId = 0L,
           accountId = aid,
