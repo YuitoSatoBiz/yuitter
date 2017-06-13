@@ -45,6 +45,7 @@ class TweetRepositoryJDBC {
           }.toSeq)
       }
   }
+
   // TODO(yuito)自分がフォローしているユーザーを含める
 
   def find(tweetId: Long): DBIO[Option[TweetView]] = {
@@ -91,9 +92,14 @@ class TweetRepositoryJDBC {
       .update(form.tweetText, Timestamp.valueOf(LocalDateTime.now))
   }
 
-  def delete(tweetId: Long): DBIO[Int] = {
-    Tweet
-      .filter(_.tweetId === tweetId)
-      .delete
+  def delete(tweetId: Long): DBIO[(Int, Int)] = {
+    (for {
+      tweet <- Tweet
+        .filter(_.tweetId === tweetId)
+        .delete
+      accountTweet <- AccountTweet
+        .filter(_.tweetId === tweetId)
+        .delete
+    } yield (tweet, accountTweet)).transactionally
   }
 }
