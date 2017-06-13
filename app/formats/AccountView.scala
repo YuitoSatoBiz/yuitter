@@ -1,6 +1,6 @@
 package formats
 
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.{Json, Writes}
 import models.Tables.Account
 
 /**
@@ -17,7 +17,7 @@ case class AccountView(
 
 object AccountView {
 
-  implicit val accountViewWrites: OWrites[AccountView] = Json.writes[AccountView]
+  implicit val accountViewWrites: Writes[AccountView] = Json.writes[AccountView]
 
   def from(a: Account#TableElementType): AccountView =
     AccountView(

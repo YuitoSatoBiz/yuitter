@@ -1,9 +1,9 @@
 package formats
 
 import java.time.LocalDateTime
-import models.Tables.Tweet
 
-import play.api.libs.json._
+import models.Tables.Tweet
+import play.api.libs.json.{Json, Writes}
 
 /**
   * クライアントで表示用のTWEETテーブルのケースクラス
@@ -20,7 +20,7 @@ case class TweetView(
 
 object TweetView {
 
-  implicit val tweetViewWrites: OWrites[TweetView] = Json.writes[TweetView]
+  implicit val tweetViewWrites: Writes[TweetView] = Json.writes[TweetView]
 
   def from(t: Tweet#TableElementType, aList: Seq[AccountView]): TweetView =
     TweetView(
