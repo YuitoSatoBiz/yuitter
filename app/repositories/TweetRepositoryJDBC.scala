@@ -92,14 +92,13 @@ class TweetRepositoryJDBC {
       .update(form.tweetText, Timestamp.valueOf(LocalDateTime.now))
   }
 
-  def delete(tweetId: Long): DBIO[(Int, Int)] = {
+  def delete(tweetId: Long): DBIO[(Int, Int)] =
     (for {
-      tweet <- Tweet
-        .filter(_.tweetId === tweetId)
-        .delete
       accountTweet <- AccountTweet
         .filter(_.tweetId === tweetId)
         .delete
-    } yield (tweet, accountTweet)).transactionally
-  }
+      tweet <- Tweet
+        .filter(_.tweetId === tweetId)
+        .delete
+    } yield (accountTweet, tweet)).transactionally
 }
