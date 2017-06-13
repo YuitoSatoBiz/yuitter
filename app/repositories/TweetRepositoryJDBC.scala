@@ -79,9 +79,7 @@ class TweetRepositoryJDBC {
           accountTweetId = Consts.DefaultId,
           accountId = aid,
           tweetId = tweet,
-          registerDatetime = Timestamp.valueOf(LocalDateTime.now),
-          updateDatetime = Timestamp.valueOf(LocalDateTime.now),
-          versionNo = Consts.DefaultVersionNo)
+          registerDatetime = Timestamp.valueOf(LocalDateTime.now)
       }
     } yield (tweet, accountTweet)).transactionally
   }

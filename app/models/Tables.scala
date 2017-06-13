@@ -66,20 +66,18 @@ trait Tables {
    *  @param memberFollowingId Database column MEMBER_FOLLOWING_ID SqlType(BIGINT), AutoInc, PrimaryKey
    *  @param followerId Database column FOLLOWER_ID SqlType(BIGINT)
    *  @param followeeId Database column FOLLOWEE_ID SqlType(BIGINT)
-   *  @param registerDatetime Database column REGISTER_DATETIME SqlType(DATETIME)
-   *  @param updateDatetime Database column UPDATE_DATETIME SqlType(DATETIME)
-   *  @param versionNo Database column VERSION_NO SqlType(BIGINT) */
-  case class AccountFollowingRow(memberFollowingId: Long, followerId: Long, followeeId: Long, registerDatetime: java.sql.Timestamp, updateDatetime: java.sql.Timestamp, versionNo: Long)
+   *  @param registerDatetime Database column REGISTER_DATETIME SqlType(DATETIME) */
+  case class AccountFollowingRow(memberFollowingId: Long, followerId: Long, followeeId: Long, registerDatetime: java.sql.Timestamp)
   /** GetResult implicit for fetching AccountFollowingRow objects using plain SQL queries */
   implicit def GetResultAccountFollowingRow(implicit e0: GR[Long], e1: GR[java.sql.Timestamp]): GR[AccountFollowingRow] = GR{
     prs => import prs._
-    AccountFollowingRow.tupled((<<[Long], <<[Long], <<[Long], <<[java.sql.Timestamp], <<[java.sql.Timestamp], <<[Long]))
+    AccountFollowingRow.tupled((<<[Long], <<[Long], <<[Long], <<[java.sql.Timestamp]))
   }
   /** Table description of table ACCOUNT_FOLLOWING. Objects of this class serve as prototypes for rows in queries. */
   class AccountFollowing(_tableTag: Tag) extends Table[AccountFollowingRow](_tableTag, "ACCOUNT_FOLLOWING") {
-    def * = (memberFollowingId, followerId, followeeId, registerDatetime, updateDatetime, versionNo) <> (AccountFollowingRow.tupled, AccountFollowingRow.unapply)
+    def * = (memberFollowingId, followerId, followeeId, registerDatetime) <> (AccountFollowingRow.tupled, AccountFollowingRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(memberFollowingId), Rep.Some(followerId), Rep.Some(followeeId), Rep.Some(registerDatetime), Rep.Some(updateDatetime), Rep.Some(versionNo)).shaped.<>({r=>import r._; _1.map(_=> AccountFollowingRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(memberFollowingId), Rep.Some(followerId), Rep.Some(followeeId), Rep.Some(registerDatetime)).shaped.<>({r=>import r._; _1.map(_=> AccountFollowingRow.tupled((_1.get, _2.get, _3.get, _4.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column MEMBER_FOLLOWING_ID SqlType(BIGINT), AutoInc, PrimaryKey */
     val memberFollowingId: Rep[Long] = column[Long]("MEMBER_FOLLOWING_ID", O.AutoInc, O.PrimaryKey)
@@ -89,10 +87,6 @@ trait Tables {
     val followeeId: Rep[Long] = column[Long]("FOLLOWEE_ID")
     /** Database column REGISTER_DATETIME SqlType(DATETIME) */
     val registerDatetime: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("REGISTER_DATETIME")
-    /** Database column UPDATE_DATETIME SqlType(DATETIME) */
-    val updateDatetime: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("UPDATE_DATETIME")
-    /** Database column VERSION_NO SqlType(BIGINT) */
-    val versionNo: Rep[Long] = column[Long]("VERSION_NO")
 
     /** Foreign key referencing Account (database name FK_ACCOUNT_FOLLOWEE_ACCOUNT) */
     lazy val accountFk1 = foreignKey("FK_ACCOUNT_FOLLOWEE_ACCOUNT", followeeId, Account)(r => r.accountId, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
@@ -106,20 +100,18 @@ trait Tables {
    *  @param accountTweetId Database column ACCOUNT_TWEET_ID SqlType(BIGINT), AutoInc, PrimaryKey
    *  @param accountId Database column ACCOUNT_ID SqlType(BIGINT)
    *  @param tweetId Database column TWEET_ID SqlType(BIGINT)
-   *  @param registerDatetime Database column REGISTER_DATETIME SqlType(DATETIME)
-   *  @param updateDatetime Database column UPDATE_DATETIME SqlType(DATETIME)
-   *  @param versionNo Database column VERSION_NO SqlType(BIGINT) */
-  case class AccountTweetRow(accountTweetId: Long, accountId: Long, tweetId: Long, registerDatetime: java.sql.Timestamp, updateDatetime: java.sql.Timestamp, versionNo: Long)
+   *  @param registerDatetime Database column REGISTER_DATETIME SqlType(DATETIME) */
+  case class AccountTweetRow(accountTweetId: Long, accountId: Long, tweetId: Long, registerDatetime: java.sql.Timestamp)
   /** GetResult implicit for fetching AccountTweetRow objects using plain SQL queries */
   implicit def GetResultAccountTweetRow(implicit e0: GR[Long], e1: GR[java.sql.Timestamp]): GR[AccountTweetRow] = GR{
     prs => import prs._
-    AccountTweetRow.tupled((<<[Long], <<[Long], <<[Long], <<[java.sql.Timestamp], <<[java.sql.Timestamp], <<[Long]))
+    AccountTweetRow.tupled((<<[Long], <<[Long], <<[Long], <<[java.sql.Timestamp]))
   }
   /** Table description of table ACCOUNT_TWEET. Objects of this class serve as prototypes for rows in queries. */
   class AccountTweet(_tableTag: Tag) extends Table[AccountTweetRow](_tableTag, "ACCOUNT_TWEET") {
-    def * = (accountTweetId, accountId, tweetId, registerDatetime, updateDatetime, versionNo) <> (AccountTweetRow.tupled, AccountTweetRow.unapply)
+    def * = (accountTweetId, accountId, tweetId, registerDatetime) <> (AccountTweetRow.tupled, AccountTweetRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(accountTweetId), Rep.Some(accountId), Rep.Some(tweetId), Rep.Some(registerDatetime), Rep.Some(updateDatetime), Rep.Some(versionNo)).shaped.<>({r=>import r._; _1.map(_=> AccountTweetRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(accountTweetId), Rep.Some(accountId), Rep.Some(tweetId), Rep.Some(registerDatetime)).shaped.<>({r=>import r._; _1.map(_=> AccountTweetRow.tupled((_1.get, _2.get, _3.get, _4.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column ACCOUNT_TWEET_ID SqlType(BIGINT), AutoInc, PrimaryKey */
     val accountTweetId: Rep[Long] = column[Long]("ACCOUNT_TWEET_ID", O.AutoInc, O.PrimaryKey)
@@ -129,10 +121,6 @@ trait Tables {
     val tweetId: Rep[Long] = column[Long]("TWEET_ID")
     /** Database column REGISTER_DATETIME SqlType(DATETIME) */
     val registerDatetime: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("REGISTER_DATETIME")
-    /** Database column UPDATE_DATETIME SqlType(DATETIME) */
-    val updateDatetime: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("UPDATE_DATETIME")
-    /** Database column VERSION_NO SqlType(BIGINT) */
-    val versionNo: Rep[Long] = column[Long]("VERSION_NO")
 
     /** Foreign key referencing Account (database name FK_ACCOUNT_TWEET_ACCOUNT) */
     lazy val accountFk = foreignKey("FK_ACCOUNT_TWEET_ACCOUNT", accountId, Account)(r => r.accountId, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
@@ -208,6 +196,9 @@ trait Tables {
     val updateDatetime: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("UPDATE_DATETIME")
     /** Database column VERSION_NO SqlType(BIGINT) */
     val versionNo: Rep[Long] = column[Long]("VERSION_NO")
+
+    /** Index over (registerDatetime) (database name IX_TWEET_REGISTER_DATETIME) */
+    val index1 = index("IX_TWEET_REGISTER_DATETIME", registerDatetime)
   }
   /** Collection-like TableQuery object for table Tweet */
   lazy val Tweet = new TableQuery(tag => new Tweet(tag))
