@@ -9,7 +9,6 @@ import models.Tables.{Account, AccountTweet, Tweet}
 import scala.concurrent.ExecutionContext.Implicits.global
 import slick.driver.MySQLDriver.api._
 import models.Tables.TweetRow
-import play.api.Logger
 
 /**
   * TWEETテーブルに対するクエリを生成しActionを返すクラス
@@ -19,45 +18,49 @@ import play.api.Logger
 class TweetRepositoryJDBC {
 
   def list(): DBIO[Seq[TweetView]] = {
+    val subAccountTweet = AccountTweet.join(Account).on {
+      case (at, a) => at.accountId === a.accountId
+    }
+
     Tweet
-      .join(
-        AccountTweet.join(Account).on {
-          case (at, a) => at.accountId === a.accountId
-        }
-      ).on { case (t, (at, a)) => t.tweetId === at.tweetId }
+      .join(subAccountTweet).on { case (t, (at, _)) => t.tweetId === at.tweetId }
       .sortBy { case (t, (_, _)) =>
         t.registerDatetime.desc
       }
       .result
-      .map(_.groupBy { case (t, (_, _)) =>
-        Logger.logger.debug(t.tweetId.toString)
-        t.tweetId
-      })
-      .map(_.map { case (key, rows) =>
-        Logger.logger.debug(key.toString)
-        val tweet = rows.map(_._1).head
-//        Logger.logger.debug(tweet.tweetId.toString)
-        val accounts = rows.map(_._2).map(_._2).map(AccountView.from)
-        TweetView.from(tweet, accounts)
-      }.toSeq)
+      .map {
+        rows =>
+          rows.map { case (t, (_, _)) =>
+            t.tweetId
+          }.distinct.map { tweetId =>
+            rows.groupBy { case (t, (_, _)) =>
+              t.tweetId
+            }.filter { case (id, _) =>
+              id == tweetId
+            }
+          }.flatMap(_.map { case (_, tuples) =>
+            val tweet = tuples.map(_._1).head
+            val accounts = tuples.map(_._2).map(_._2).map(AccountView.from)
+            TweetView.from(tweet, accounts)
+          }.toSeq)
+      }
   }
 
-  // TODO(yuitoe)自分がフォローしているユーザーを含める
+  // TODO(yuito)自分がフォローしているユーザーを含める
 
   def find(tweetId: Long): DBIO[Option[TweetView]] = {
+    val subAccountTweet = AccountTweet.join(Account).on {
+      case (at, a) => at.accountId === a.accountId
+    }
     Tweet
-      .join(
-        AccountTweet.join(Account).on {
-          case (at, a) => at.accountId === a.accountId
-        }
-      ).on { case (t, (at, a)) => t.tweetId === at.tweetId }
+      .join(subAccountTweet).on { case (t, (at, _)) => t.tweetId === at.tweetId }
+      .filter { case (t, (_, _)) => t.tweetId === tweetId }
       .result
-      .map(_.groupBy { case (t, (_, _)) => t.tweetId })
-      .map(_.map { case (_, rows) =>
+      .map { rows =>
         val tweet = rows.map(_._1).head
         val accounts = rows.map(_._2).map(_._2).map(AccountView.from)
-        TweetView.from(tweet, accounts)
-      }.headOption)
+        Option.apply(TweetView.from(tweet, accounts))
+      }
   }
 
   def create(form: TweetCommand): DBIO[Int] = {
