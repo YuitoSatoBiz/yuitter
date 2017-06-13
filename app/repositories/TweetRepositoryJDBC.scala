@@ -65,7 +65,7 @@ class TweetRepositoryJDBC {
 
   def create(form: TweetCommand): DBIO[(Long, Option[Int])] = {
     (for {
-      a <- Tweet returning Tweet.map(_.tweetId) += TweetRow(
+      tweet <- Tweet returning Tweet.map(_.tweetId) += TweetRow(
         tweetId = 0L,
         // TODO(yuito) ログイン中のメンバーのAccountIdしかおくれないようにする
         tweetText = form.tweetText,
@@ -73,16 +73,16 @@ class TweetRepositoryJDBC {
         updateDatetime = Timestamp.valueOf(LocalDateTime.now),
         versionNo = 0L
       )
-      b <- AccountTweet ++= form.accountIds.get.map { aid =>
+      accountTweet <- AccountTweet ++= form.accountIds.get.map { aid =>
         AccountTweetRow(
           accountTweetId = 0L,
           accountId = aid,
-          tweetId = a,
+          tweetId = tweet,
           registerDatetime = Timestamp.valueOf(LocalDateTime.now),
           updateDatetime = Timestamp.valueOf(LocalDateTime.now),
           versionNo = 0L)
       }
-    } yield (a, b)).transactionally
+    } yield (tweet, accountTweet)).transactionally
   }
 
   def update(tweetId: Long, form: TweetCommand): DBIO[Int] = {

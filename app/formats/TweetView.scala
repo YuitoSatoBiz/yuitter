@@ -22,12 +22,12 @@ object TweetView {
 
   implicit val tweetViewWrites: Writes[TweetView] = Json.writes[TweetView]
 
-  def from(t: Tweet#TableElementType, aList: Seq[AccountView]): TweetView =
+  def from(tweet: Tweet#TableElementType, accounts: Seq[AccountView]): TweetView =
     TweetView(
-      tweetId = t.tweetId,
-      tweetText = t.tweetText,
-      registerDatetime = t.registerDatetime.toLocalDateTime,
-      versionNo = t.versionNo,
-      accounts = aList
+      tweetId = tweet.tweetId,
+      tweetText = tweet.tweetText,
+      registerDatetime = tweet.registerDatetime.toLocalDateTime,
+      versionNo = tweet.versionNo,
+      accounts = accounts
     )
 }
