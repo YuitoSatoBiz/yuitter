@@ -23,3 +23,5 @@ PUT           /api/tweets/:tweetId        controllers.TweetController.update(twe
 
 # Mapping to /tweets/:tweetId
 DELETE        /api/tweets/:tweetId        controllers.TweetController.delete(tweetId: Long)
+
+POST          /api/members                controllers.MemberController.create
