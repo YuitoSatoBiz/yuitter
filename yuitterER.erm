@@ -155,7 +155,7 @@
 					<not_null>true</not_null>
 				</normal_column>
 				<normal_column>
-					<physical_name>AccountName</physical_name>
+					<physical_name>ACCOUNT_NAME</physical_name>
 					<logical_name>アカウント名</logical_name>
 					<type>varchar(n)</type>
 					<length>50</length>
