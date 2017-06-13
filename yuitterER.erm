@@ -109,12 +109,12 @@
 			<physical_name>ACCOUNT</physical_name>
 			<logical_name>アカウント</logical_name>
 			<description></description>
-			<height>162</height>
-			<width>240</width>
+			<height>228</height>
+			<width>257</width>
 			<font_name>.Helvetica Neue DeskInterface</font_name>
 			<font_size>9</font_size>
-			<x>780</x>
-			<y>389</y>
+			<x>530</x>
+			<y>368</y>
 			<color>
 				<r>128</r>
 				<g>128</g>
@@ -213,8 +213,8 @@
 			<width>367</width>
 			<font_name>.Helvetica Neue DeskInterface</font_name>
 			<font_size>9</font_size>
-			<x>315</x>
-			<y>387</y>
+			<x>64</x>
+			<y>398</y>
 			<color>
 				<r>128</r>
 				<g>128</g>
@@ -317,8 +317,8 @@
 			<width>293</width>
 			<font_name>.Helvetica Neue DeskInterface</font_name>
 			<font_size>9</font_size>
-			<x>762</x>
-			<y>672</y>
+			<x>650</x>
+			<y>671</y>
 			<color>
 				<r>128</r>
 				<g>128</g>
@@ -417,8 +417,8 @@
 			<width>284</width>
 			<font_name>.Helvetica Neue DeskInterface</font_name>
 			<font_size>9</font_size>
-			<x>756</x>
-			<y>152</y>
+			<x>529</x>
+			<y>122</y>
 			<color>
 				<r>128</r>
 				<g>128</g>
@@ -480,8 +480,8 @@
 			<width>231</width>
 			<font_name>.Helvetica Neue DeskInterface</font_name>
 			<font_size>9</font_size>
-			<x>1097</x>
-			<y>398</y>
+			<x>927</x>
+			<y>395</y>
 			<color>
 				<r>128</r>
 				<g>128</g>

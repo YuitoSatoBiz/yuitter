@@ -6,7 +6,7 @@ import models.Tables.Tweet
 import play.api.libs.json._
 
 /**
-  * MEMBERテーブルの情報を付加させたTWEETテーブルのケースクラス
+  * クライアントで表示用のTWEETテーブルのケースクラス
   *
   * @author yuito.sato
   */

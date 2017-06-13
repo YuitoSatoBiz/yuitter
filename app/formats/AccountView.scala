@@ -4,6 +4,8 @@ import play.api.libs.json.{Json, OWrites}
 import models.Tables.Account
 
 /**
+  * クライアントで表示用のAccountTableのケースクラス
+  *
   * @author yuito.sato
   */
 case class AccountView(
