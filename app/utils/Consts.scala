@@ -1,6 +1,8 @@
 package utils
 
 /**
+  * アプリ上で使用する定数を管理するオブジェクト
+  *
   * @author yuito.sato
   */
 object Consts {
