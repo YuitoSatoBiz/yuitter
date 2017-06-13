@@ -8,7 +8,7 @@ import models.Tables.{Account, AccountTweet, Tweet}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import slick.driver.MySQLDriver.api._
-import models.Tables.TweetRow
+import models.Tables.{AccountTweetRow, TweetRow}
 
 /**
   * TWEETテーブルに対するクエリを生成しActionを返すクラス
@@ -45,7 +45,6 @@ class TweetRepositoryJDBC {
           }.toSeq)
       }
   }
-
   // TODO(yuito)自分がフォローしているユーザーを含める
 
   def find(tweetId: Long): DBIO[Option[TweetView]] = {
@@ -63,15 +62,27 @@ class TweetRepositoryJDBC {
       }
   }
 
-  def create(form: TweetCommand): DBIO[Int] = {
-    Tweet += TweetRow(
-      tweetId = 0L,
-      // TODO(yuito) ログイン中のメンバーのIDを取得する
-      tweetText = form.tweetText,
-      registerDatetime = Timestamp.valueOf(LocalDateTime.now),
-      updateDatetime = Timestamp.valueOf(LocalDateTime.now),
-      versionNo = 0L
-    )
+  def create(form: TweetCommand): DBIO[(Long, Option[Int])] = {
+    val transactionally = (for {
+      a <- Tweet returning Tweet.map(_.tweetId) += TweetRow(
+        tweetId = 0L,
+        // TODO(yuito) ログイン中のメンバーのAccountIdしかおくれないようにする
+        tweetText = form.tweetText,
+        registerDatetime = Timestamp.valueOf(LocalDateTime.now),
+        updateDatetime = Timestamp.valueOf(LocalDateTime.now),
+        versionNo = 0L
+      )
+      b <- AccountTweet ++= form.accountIds.map { aid =>
+        AccountTweetRow(
+          accountTweetId = 0L,
+          accountId = aid,
+          tweetId = a,
+          registerDatetime = Timestamp.valueOf(LocalDateTime.now),
+          updateDatetime = Timestamp.valueOf(LocalDateTime.now),
+          versionNo = 0L)
+      }
+    } yield (a, b)).transactionally
+    transactionally
   }
 
   def update(tweetId: Long, form: TweetCommand): DBIO[Int] = {
