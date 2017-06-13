@@ -63,7 +63,7 @@ class TweetRepositoryJDBC {
   }
 
   def create(form: TweetCommand): DBIO[(Long, Option[Int])] = {
-    val transactionally = (for {
+    (for {
       a <- Tweet returning Tweet.map(_.tweetId) += TweetRow(
         tweetId = 0L,
         // TODO(yuito) ログイン中のメンバーのAccountIdしかおくれないようにする
@@ -82,7 +82,6 @@ class TweetRepositoryJDBC {
           versionNo = 0L)
       }
     } yield (a, b)).transactionally
-    transactionally
   }
 
   def update(tweetId: Long, form: TweetCommand): DBIO[Int] = {
