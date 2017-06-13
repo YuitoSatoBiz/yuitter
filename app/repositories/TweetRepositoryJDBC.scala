@@ -9,6 +9,7 @@ import models.Tables.{Account, AccountTweet, Tweet}
 import scala.concurrent.ExecutionContext.Implicits.global
 import slick.driver.MySQLDriver.api._
 import models.Tables.{AccountTweetRow, TweetRow}
+import utils.Consts
 
 /**
   * TWEETテーブルに対するクエリを生成しActionを返すクラス
@@ -66,21 +67,21 @@ class TweetRepositoryJDBC {
   def create(form: TweetCommand): DBIO[(Long, Option[Int])] = {
     (for {
       tweet <- Tweet returning Tweet.map(_.tweetId) += TweetRow(
-        tweetId = 0L,
+        tweetId = Consts.DefaultId,
         // TODO(yuito) ログイン中のメンバーのAccountIdしかおくれないようにする
         tweetText = form.tweetText,
         registerDatetime = Timestamp.valueOf(LocalDateTime.now),
         updateDatetime = Timestamp.valueOf(LocalDateTime.now),
-        versionNo = 0L
+        versionNo = Consts.DefaultVersionNo
       )
       accountTweet <- AccountTweet ++= form.accountIds.get.map { aid =>
         AccountTweetRow(
-          accountTweetId = 0L,
+          accountTweetId = Consts.DefaultId,
           accountId = aid,
           tweetId = tweet,
           registerDatetime = Timestamp.valueOf(LocalDateTime.now),
           updateDatetime = Timestamp.valueOf(LocalDateTime.now),
-          versionNo = 0L)
+          versionNo = Consts.DefaultVersionNo)
       }
     } yield (tweet, accountTweet)).transactionally
   }
