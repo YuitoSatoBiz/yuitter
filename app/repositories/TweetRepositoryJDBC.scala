@@ -22,7 +22,6 @@ class TweetRepositoryJDBC {
     val subAccountTweet = AccountTweet.join(Account).on {
       case (at, a) => at.accountId === a.accountId
     }
-
     Tweet
       .join(subAccountTweet).on { case (t, (at, _)) => t.tweetId === at.tweetId }
       .sortBy { case (t, (_, _)) =>
@@ -80,6 +79,7 @@ class TweetRepositoryJDBC {
           accountId = aid,
           tweetId = tweet,
           registerDatetime = Timestamp.valueOf(LocalDateTime.now)
+        )
       }
     } yield (tweet, accountTweet)).transactionally
   }
@@ -91,7 +91,7 @@ class TweetRepositoryJDBC {
       .update(form.tweetText, Timestamp.valueOf(LocalDateTime.now))
   }
 
-  def delete(tweetId: Long): DBIO[(Int, Int)] =
+  def delete(tweetId: Long): DBIO[(Int, Int)] = {
     (for {
       accountTweet <- AccountTweet
         .filter(_.tweetId === tweetId)
@@ -100,4 +100,5 @@ class TweetRepositoryJDBC {
         .filter(_.tweetId === tweetId)
         .delete
     } yield (accountTweet, tweet)).transactionally
+  }
 }
