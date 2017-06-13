@@ -1,35 +1,34 @@
 package formats
 
 import java.time.LocalDateTime
-import models.Tables.{Member, Tweet}
 
-import play.api.libs.json._
+import models.Tables.Tweet
+import play.api.libs.json.{Json, Writes}
 
 /**
-  * MEMBERテーブルの情報を付加させたTWEETテーブルのケースクラス
+  * クライアントで表示用のTWEETテーブルのケースクラス
   *
   * @author yuito.sato
   */
 case class TweetView(
   tweetId: Long,
-  memberId: Long,
   tweetText: String,
   registerDatetime: LocalDateTime,
   versionNo: Long,
-  memberName: String
+  accounts: Seq[AccountView]
 )
 
 object TweetView {
 
-  implicit val tweetViewWrites: OWrites[TweetView] = Json.writes[TweetView]
+  implicit val tweetViewWrites: Writes[TweetView] = Json.writes[TweetView]
 
-  def from(t: Tweet#TableElementType, m: Member#TableElementType): TweetView =
+  def from(tweet: Tweet#TableElementType, accounts: Seq[AccountView]): TweetView = {
     TweetView(
-      tweetId = t.tweetId,
-      memberId = t.memberId,
-      tweetText = t.tweetText,
-      registerDatetime = t.registerDatetime.toLocalDateTime,
-      versionNo = t.versionNo,
-      memberName = m.memberName
+      tweetId = tweet.tweetId,
+      tweetText = tweet.tweetText,
+      registerDatetime = tweet.registerDatetime.toLocalDateTime,
+      versionNo = tweet.versionNo,
+      accounts = accounts
     )
+  }
 }

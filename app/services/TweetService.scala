@@ -17,14 +17,14 @@ import slick.driver.JdbcProfile
 class TweetService @Inject()(val tweetJdbc: TweetRepositoryJDBC, val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile] {
 
   def list(): Future[Seq[TweetView]] = {
-    db.run(tweetJdbc.listWithMember())
+    db.run(tweetJdbc.list())
   }
 
   def find(tweetId: Long): Future[Option[TweetView]] = {
     db.run(tweetJdbc.find(tweetId: Long))
   }
 
-  def create(form: TweetCommand): Future[Int] = {
+  def create(form: TweetCommand): Future[(Long, Option[Int])] = {
     db.run(tweetJdbc.create(form))
   }
 
@@ -32,7 +32,7 @@ class TweetService @Inject()(val tweetJdbc: TweetRepositoryJDBC, val dbConfigPro
     db.run(tweetJdbc.update(tweetId, form))
   }
 
-  def delete(tweetId: Long): Future[Int] = {
+  def delete(tweetId: Long): Future[(Int, Int)] = {
     db.run(tweetJdbc.delete(tweetId))
   }
 }
