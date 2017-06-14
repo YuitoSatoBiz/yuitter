@@ -11,7 +11,7 @@ case class MemberCommand (
   emailAddress: String,
   password: String,
   versionNo: Option[Long],
-  account: AccountCommand
+  account: Option[AccountCommand]
 )
 
 object MemberCommand {

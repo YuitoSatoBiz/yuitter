@@ -33,16 +33,16 @@ class MemberRepositoryJDBC @Inject()(val bCrypt: BCryptPasswordEncoder) {
         updateDatetime = Timestamp.valueOf(LocalDateTime.now),
         versionNo = Consts.DefaultVersionNo
       )
-      account <- Account += AccountRow(
+      a <- Account += AccountRow(
         accountId = Consts.DefaultId,
         memberId = memberId,
-        accountName = form.account.accountName,
-        avatar = form.account.avatar,
-        backgroundImage = form.account.backgroundImage,
+        accountName = form.account.get.accountName,
+        avatar = form.account.get.avatar,
+        backgroundImage = form.account.get.backgroundImage,
         registerDatetime = Timestamp.valueOf(LocalDateTime.now),
         updateDatetime = Timestamp.valueOf(LocalDateTime.now),
         versionNo = Consts.DefaultVersionNo
       )
-    } yield (memberId, account)).transactionally
+    } yield (memberId, a)).transactionally
   }
 }
