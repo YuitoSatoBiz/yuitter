@@ -6,6 +6,7 @@ import formats.MemberCommand
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import repositories.MemberRepositoryJDBC
 import slick.driver.JdbcProfile
+import models.Tables.Member
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
@@ -13,10 +14,11 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 class SessionService @Inject()(val memberJdbc: MemberRepositoryJDBC, val dbConfigProvider: DatabaseConfigProvider, val bCrypt: BCryptPasswordEncoder)(implicit ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
 
-  def authenticate(form: MemberCommand): Future[Boolean] = {
+  def authenticate(form: MemberCommand): Future[Member#TableElementType] = {
     for {
       optMember <- db.run(memberJdbc.findByEmailAddress(form.emailAddress))
-      member <- Future.successful(optMember.getOrElse(throw new IllegalArgumentException("このメールアドレスは登録されていません。")))
-    } yield bCrypt.matches(form.password, member.password)
+      member <- Future.successful(optMember.getOrElse(throw new Exception))
+      member <- Future.successful(member) if bCrypt.matches(form.password, member.password)
+    } yield member
   }
 }

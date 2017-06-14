@@ -1,5 +1,6 @@
 package controllers
 
+import java.util.UUID
 import javax.inject.Inject
 import formats.MemberCommand
 import play.api.libs.json.{JsError, JsValue}
@@ -23,15 +24,12 @@ class SessionController @Inject()(val sessionService: SessionService)(implicit e
         }
       },
       valid = { form =>
-        sessionService.authenticate(form).map { authenticateFlag =>
-          if (authenticateFlag) {
-            Ok(Json.obj("result" -> "success")).withSession(
-              "connected" -> "ok")
-          } else {
-            BadRequest(Json.obj("result" -> "failure", "error" -> "パスワードまたはメールアドレスが間違っています。"))
-          }
-        }.recover { case e =>
-            BadRequest(Json.obj("result" -> "failure", "error" -> e.getMessage))
+        sessionService.authenticate(form).map { member =>
+          val token = UUID.randomUUID().toString
+          Ok(Json.obj("result" -> "success")).withSession(
+            token -> member.memberId.toString)
+        }.recover { case _ =>
+          BadRequest(Json.obj("result" -> "failure", "error" -> "メールアドレスまたはパスワードが間違えています。"))
         }
       }
     )
