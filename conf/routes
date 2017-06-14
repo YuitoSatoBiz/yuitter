@@ -25,3 +25,5 @@ PUT           /api/tweets/:tweetId        controllers.TweetController.update(twe
 DELETE        /api/tweets/:tweetId        controllers.TweetController.delete(tweetId: Long)
 
 POST          /api/members                controllers.MemberController.create
+
+GET           /api/sign_in                controllers.SignInController.signIn
