@@ -31,6 +31,7 @@ class SessionController @Inject()(val sessionService: SessionService, val cache:
           cache.set(token, memberId)
           Ok(Json.obj("result" -> "success")).withSession(
             "token" -> token)
+
         }.recover { case _ =>
           BadRequest(Json.obj("result" -> "failure", "error" -> "メールアドレスまたはパスワードが間違えています。"))
         }

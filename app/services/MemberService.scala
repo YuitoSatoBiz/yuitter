@@ -8,6 +8,7 @@ import play.api.libs.json.JsValue
 import play.api.mvc.Request
 import repositories.MemberRepositoryJDBC
 import models.Tables.Member
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import play.api.cache.CacheApi
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -18,7 +19,7 @@ import slick.driver.JdbcProfile
   *
   * @author yuito.sato
   */
-class MemberService @Inject()(val memberJdbc: MemberRepositoryJDBC, val dbConfigProvider: DatabaseConfigProvider, cache: CacheApi)(implicit ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
+class MemberService @Inject()(val memberJdbc: MemberRepositoryJDBC, val dbConfigProvider: DatabaseConfigProvider, val cache: CacheApi, val bCrypt: BCryptPasswordEncoder)(implicit ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
 
   def create(form: MemberCommand): Future[(Long, Int)] = {
     for {
@@ -35,5 +36,13 @@ class MemberService @Inject()(val memberJdbc: MemberRepositoryJDBC, val dbConfig
     db.run(memberJdbc.findById(memberId
       .getOrElse(throw new IllegalArgumentException("セッションが切れています")))
     )
+  }
+
+  def authenticate(form: MemberCommand): Future[Member#TableElementType] = {
+    for {
+      optMember <- db.run(memberJdbc.findByEmailAddress(form.emailAddress))
+      member <- Future.successful(optMember.getOrElse(throw new Exception))
+      member <- Future.successful(member) if bCrypt.matches(form.password, member.password)
+    } yield member
   }
 }
