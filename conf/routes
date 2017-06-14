@@ -20,4 +20,4 @@ DELETE        /api/tweets/:tweetId        controllers.TweetController.delete(twe
 POST          /api/members                controllers.MemberController.create
 
 # SessionAPI
-GET           /api/sign_in                controllers.SessionController.create
+POST          /api/sign_in                controllers.SessionController.create
