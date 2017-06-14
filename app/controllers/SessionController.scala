@@ -1,13 +1,11 @@
 package controllers
 
 import javax.inject.Inject
-
 import formats.MemberCommand
 import play.api.libs.json.{JsError, JsValue}
 import play.api.mvc.{Action, Controller}
 import play.api.libs.json._
 import services.SessionService
-
 import scala.concurrent.{ExecutionContext, Future}
 
 /**

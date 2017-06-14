@@ -1,13 +1,11 @@
 package controllers
 
 import javax.inject.Inject
-
 import formats.TweetCommand
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent, Controller}
 import services.TweetService
-
 import scala.concurrent.Future
 
 /**

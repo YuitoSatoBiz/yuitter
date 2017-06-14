@@ -3,20 +3,18 @@ package controllers
 import javax.inject.Inject
 
 import formats.MemberCommand
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
-import play.api.mvc.{Action, AnyContent, Controller}
+import play.api.mvc.{Action, Controller}
 import services.MemberService
-import scala.concurrent.ExecutionContext.Implicits.global
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * 会員のCRUD処理をするコントローラー
   *
   * @author yuito.sato
   */
-class MemberController @Inject()(val memberService: MemberService) extends Controller {
+class MemberController @Inject()(val memberService: MemberService)(implicit ec: ExecutionContext) extends Controller {
 
   /**
     * Memberを登録 POST /api/members

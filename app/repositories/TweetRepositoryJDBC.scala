@@ -2,21 +2,20 @@ package repositories
 
 import java.sql.Timestamp
 import java.time.LocalDateTime
-
+import javax.inject.Inject
 import formats.{AccountView, TweetCommand, TweetView}
 import models.Tables.{Account, AccountTweet, Tweet}
-
-import scala.concurrent.ExecutionContext.Implicits.global
 import slick.driver.MySQLDriver.api._
 import models.Tables.{AccountTweetRow, TweetRow}
 import utils.Consts
+import scala.concurrent.ExecutionContext
 
 /**
   * TWEETテーブルに対するクエリを生成しActionを返すクラス
   *
   * @author yuito.sato
   */
-class TweetRepositoryJDBC {
+class TweetRepositoryJDBC @Inject()(implicit ec: ExecutionContext){
 
   def list(): DBIO[Seq[TweetView]] = {
     val subAccountTweet = AccountTweet.join(Account).on {

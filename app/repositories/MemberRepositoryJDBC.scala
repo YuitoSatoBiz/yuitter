@@ -3,21 +3,20 @@ package repositories
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import javax.inject.Inject
-
 import formats.MemberCommand
 import models.Tables.{Account, Member}
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import scala.concurrent.ExecutionContext.Implicits.global
 import slick.driver.MySQLDriver.api._
 import models.Tables.{AccountRow, MemberRow}
 import utils.Consts
+import scala.concurrent.ExecutionContext
 
 /**
   * MEMBERテーブルに対するクエリを生成したActionを返すクラス
   *
   * @author yuito.sato
   */
-class MemberRepositoryJDBC @Inject()(val bCrypt: BCryptPasswordEncoder) {
+class MemberRepositoryJDBC @Inject()(val bCrypt: BCryptPasswordEncoder)(implicit ec: ExecutionContext) {
 
   def countByEmailAddress(emailAddress: String): DBIO[Int] = {
     Member.filter(_.emailAddress === emailAddress).length.result

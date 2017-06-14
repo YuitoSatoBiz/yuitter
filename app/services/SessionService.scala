@@ -1,13 +1,11 @@
 package services
 
 import javax.inject.Inject
-
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import formats.MemberCommand
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import repositories.MemberRepositoryJDBC
 import slick.driver.JdbcProfile
-
 import scala.concurrent.{ExecutionContext, Future}
 
 /**

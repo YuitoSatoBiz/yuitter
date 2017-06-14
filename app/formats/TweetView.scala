@@ -1,7 +1,6 @@
 package formats
 
 import java.time.LocalDateTime
-
 import models.Tables.Tweet
 import play.api.libs.json.{Json, Writes}
 
