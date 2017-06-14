@@ -33,7 +33,7 @@ class MemberRepositoryJDBC @Inject()(val bCrypt: BCryptPasswordEncoder) {
         updateDatetime = Timestamp.valueOf(LocalDateTime.now),
         versionNo = Consts.DefaultVersionNo
       )
-      a <- Account += AccountRow(
+      account <- Account += AccountRow(
         accountId = Consts.DefaultId,
         memberId = memberId,
         accountName = form.account.get.accountName,
@@ -43,6 +43,10 @@ class MemberRepositoryJDBC @Inject()(val bCrypt: BCryptPasswordEncoder) {
         updateDatetime = Timestamp.valueOf(LocalDateTime.now),
         versionNo = Consts.DefaultVersionNo
       )
-    } yield (memberId, a)).transactionally
+    } yield (memberId, account)).transactionally
+  }
+
+  def findByEmailAddress(emailAddress: String): DBIO[Option[Member#TableElementType]] = {
+    Member.filter(_.emailAddress === emailAddress).result.headOption
   }
 }
