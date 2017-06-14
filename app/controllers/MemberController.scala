@@ -19,7 +19,7 @@ import scala.concurrent.Future
 class MemberController @Inject()(val memberService: MemberService) extends Controller {
 
   /**
-    * Memberを登録
+    * Memberを登録 POST /api/members
     */
   def create: Action[JsValue] = Action.async(parse.json) { implicit rs =>
     rs.body.validate[MemberCommand].fold(
