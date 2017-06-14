@@ -7,23 +7,18 @@ import formats.MemberCommand
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import repositories.MemberRepositoryJDBC
 import slick.driver.JdbcProfile
-import slick.driver.MySQLDriver.api._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * @author yuito.sato
   */
-class SessionService @Inject()(val memberJdbc: MemberRepositoryJDBC, val dbConfigProvider: DatabaseConfigProvider, val bCrypt: BCryptPasswordEncoder) extends HasDatabaseConfigProvider[JdbcProfile] {
+class SessionService @Inject()(val memberJdbc: MemberRepositoryJDBC, val dbConfigProvider: DatabaseConfigProvider, val bCrypt: BCryptPasswordEncoder)(implicit ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
 
   def authenticate(form: MemberCommand): Future[Boolean] = {
-//    val future = for {
-//      optMember <- db.run(memberJdbc.findByEmailAddress(form.emailAddress))
-//      member <- optMember.getOrElse{ throw new IllegalArgumentException("error") }
-//    } yield bCrypt.matches(form.password, optMember.getOrElse().password)
     for {
       optMember <- db.run(memberJdbc.findByEmailAddress(form.emailAddress))
-      member <- optMember
+      member <- Future.successful(optMember.getOrElse(throw new IllegalArgumentException("このメールアドレスは登録されていません。")))
     } yield bCrypt.matches(form.password, member.password)
   }
 }

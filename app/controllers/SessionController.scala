@@ -2,31 +2,39 @@ package controllers
 
 import javax.inject.Inject
 
-import formats.{MemberCommand, TweetCommand}
+import formats.MemberCommand
 import play.api.libs.json.{JsError, JsValue}
-import play.api.mvc.{Action, AnyContent, BodyParsers, Controller, Result}
+import play.api.mvc.{Action, Controller}
 import play.api.libs.json._
 import services.SessionService
-//import play.mvc.BodyParsers
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * ログイン処理をするコントローラー
   *
   * @author yuito.sato
   */
-class SessionController @Inject()(val sessionService: SessionService) extends Controller {
+class SessionController @Inject()(val sessionService: SessionService)(implicit ec: ExecutionContext) extends Controller {
 
-  def create: Action[JsValue] = Action(BodyParsers.parse.json) { implicit rs =>
+  def create: Action[JsValue] = Action.async(parse.json) { implicit rs =>
     rs.body.validate[MemberCommand].fold(
       invalid = { e =>
-        BadRequest(Json.obj("result" -> "failure", "error" -> JsError.toJson(e)))
+        Future {
+          BadRequest(Json.obj("result" -> "failure", "error" -> JsError.toJson(e)))
+        }
       },
       valid = { form =>
-        sessionService.authenticate(form)
-        Ok("result" -> "success").withSession(
-          "connected" -> "user@gmail.com")
+        sessionService.authenticate(form).map { authenticateFlag =>
+          if (authenticateFlag) {
+            Ok(Json.obj("result" -> "success")).withSession(
+              "connected" -> "ok")
+          } else {
+            BadRequest(Json.obj("result" -> "failure", "error" -> "パスワードまたはメールアドレスが間違っています。"))
+          }
+        }.recover { case e =>
+            BadRequest(Json.obj("result" -> "failure", "error" -> e.getMessage))
+        }
       }
     )
   }
