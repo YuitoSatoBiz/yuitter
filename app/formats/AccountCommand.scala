@@ -7,7 +7,7 @@ import play.api.libs.json.{Json, Reads}
   *
   * @author yuito.sato
   */
-class AccountCommand(
+case class AccountCommand(
   accountName: String,
   avatar: Option[String],
   backgroundImage: Option[String],
