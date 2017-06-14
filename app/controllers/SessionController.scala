@@ -6,6 +6,7 @@ import formats.MemberCommand
 import play.api.libs.json.{JsError, JsValue}
 import play.api.mvc.{Action, Controller}
 import play.api.libs.json._
+import play.api.cache._
 import services.SessionService
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -14,7 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
   *
   * @author yuito.sato
   */
-class SessionController @Inject()(val sessionService: SessionService)(implicit ec: ExecutionContext) extends Controller {
+class SessionController @Inject()(val sessionService: SessionService, val cache: CacheApi)(implicit ec: ExecutionContext) extends Controller {
 
   def create: Action[JsValue] = Action.async(parse.json) { implicit rs =>
     rs.body.validate[MemberCommand].fold(
@@ -26,8 +27,10 @@ class SessionController @Inject()(val sessionService: SessionService)(implicit e
       valid = { form =>
         sessionService.authenticate(form).map { member =>
           val token = UUID.randomUUID().toString
+          val memberId = member.memberId
+          cache.set(token, memberId)
           Ok(Json.obj("result" -> "success")).withSession(
-            token -> member.memberId.toString)
+            "token" -> token)
         }.recover { case _ =>
           BadRequest(Json.obj("result" -> "failure", "error" -> "メールアドレスまたはパスワードが間違えています。"))
         }
