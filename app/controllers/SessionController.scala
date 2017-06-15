@@ -3,15 +3,13 @@ package controllers
 import java.util.UUID
 import javax.inject.Inject
 import formats.MemberCommand
-import play.api.Logger
 import play.api.libs.json.{JsError, JsValue}
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{Action, AnyContent, Controller}
 import play.api.libs.json._
 import play.api.cache._
 import services.MemberService
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
 /**
   * ログイン処理をするコントローラー
@@ -33,11 +31,24 @@ class SessionController @Inject()(val memberService: MemberService, val cache: C
           val memberId = member.memberId
           cache.set(token, memberId, 30.days)
           Ok(Json.obj("result" -> "success")).withSession(
-            "token" -> token)
+            rs.session + ("token" -> token))
         }.recover { case _ =>
           BadRequest(Json.obj("result" -> "failure", "error" -> "メールアドレスまたはパスワードが間違えています。"))
         }
       }
     )
+  }
+
+  def delete: Action[AnyContent] = Action.async { implicit rs =>
+    Future {
+      rs.session.get("token").getOrElse {
+        throw new IllegalArgumentException("すでにログアウトされています。")
+      }
+    }.map { token =>
+      cache.remove(token)
+      Ok(Json.obj("result" -> "success")).withNewSession
+    }.recover { case e =>
+      BadRequest(Json.obj("result" -> "failure", "error" -> e.getMessage))
+    }
   }
 }

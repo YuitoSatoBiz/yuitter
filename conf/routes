@@ -21,3 +21,4 @@ POST          /api/members                controllers.MemberController.create
 
 # SessionAPI
 POST          /api/sign_in                controllers.SessionController.create
+GET           /api/sign_out               controllers.SessionController.delete
