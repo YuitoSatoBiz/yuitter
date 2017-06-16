@@ -1,8 +1,18 @@
 package formats
 
-/**
-  * Created by yuito.sato on 2017/06/16.
-  */
-class KeywordCommand {
+import play.api.libs.json.{Json, Reads}
 
+/**
+  * 検索フォームのケースクラス
+  *
+  * @author yuito.sato
+  */
+
+case class KeywordCommand(
+  keyword: String
+)
+
+object KeywordCommand {
+
+  implicit val keywordCommandReads: Reads[KeywordCommand] = Json.reads[KeywordCommand]
 }
