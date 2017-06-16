@@ -22,8 +22,8 @@ class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
     Account
       .filter(_.accountName like "%" + "%")
       .result
-      .map(_.map{ account =>
-        AccountView.from(account)
+      .map(_.map{ a =>
+        AccountView.from(a)
       })
   }
 
@@ -53,6 +53,16 @@ class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
       }
       .result
       .map(_.map{ case (a, _) =>
+        AccountView.from(a)
+      })
+  }
+
+  def find(accountId: Long): DBIO[Option[AccountView]] = {
+    Account
+      .filter(_.accountId === accountId)
+      .result
+      .headOption
+      .map(_.map{ a =>
         AccountView.from(a)
       })
   }

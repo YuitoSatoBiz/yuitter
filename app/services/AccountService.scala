@@ -27,5 +27,9 @@ class AccountService @Inject()(val accountJdbc: AccountRepositoryJDBC, val dbCon
   def listFollowees(accountId: Long): Future[Seq[AccountView]] = {
     db.run(accountJdbc.listFollowees(accountId))
   }
+
+  def find(accountId: Long): Future[Option[AccountView]] = {
+    db.run(accountJdbc.find(accountId))
+  }
 }
 

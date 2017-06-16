@@ -45,7 +45,12 @@ class AccountController @Inject()(val accountService: AccountService) extends Co
     }
   }
 
-  def find(accountId: Long) = ???
+  def find(accountId: Long): Action[AnyContent] = Action.async { implicit rs =>
+    accountService.find(accountId).map {
+      case Some(account) => Ok(Json.toJson(account))
+      case None => BadRequest(Json.obj("result" -> "failure", "errors" -> "指定されたIDのアカウントは存在しません"))
+    }
+  }
 
   def create = ???
 
