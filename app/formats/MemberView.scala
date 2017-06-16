@@ -17,7 +17,7 @@ case class MemberView(
 
 object MemberView {
 
-  implicit val memberViewWrites: Writes[MemberView] = Json.writes[MemberView]
+  implicit val memberViewWrites: Writes[MemberView] = Json.writes[MemberView] 
 
   def from(member: Member#TableElementType, accounts: Seq[AccountView]): MemberView = {
     MemberView(

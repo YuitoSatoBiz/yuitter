@@ -19,9 +19,6 @@ import slick.driver.JdbcProfile
 class MemberService @Inject()(val memberJdbc: MemberRepositoryJDBC, val dbConfigProvider: DatabaseConfigProvider, val cache: CacheApi, val bCrypt: BCryptPasswordEncoder)(implicit ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
 
   def create(form: MemberCommand): Future[Unit] = {
-    if (form.password.length <= 8) {
-      return Future.failed(new IllegalArgumentException("8文字未満のパスワードは登録できません。"))
-    }
     for {
       emailAddress <- db.run(memberJdbc.findByEmailAddress(form.emailAddress))
       _ <- if (emailAddress.isEmpty) db.run(memberJdbc.create(form)) else Future.failed(new IllegalArgumentException("このメールアドレスはすでに使用されています。"))
@@ -42,7 +39,7 @@ class MemberService @Inject()(val memberJdbc: MemberRepositoryJDBC, val dbConfig
     } yield memberId
   }
 
-  def findCurrentMemberWithAccounts(implicit rs: Request[AnyContent]): Future[Option[MemberView]] = {
+  def findCurrentWithAccounts(implicit rs: Request[AnyContent]): Future[Option[MemberView]] = {
     findCurrentMemberId.map(memberJdbc.findByIdWithAccounts) match {
       case Some(dbio) => db.run(dbio)
       case None => Future.failed(new IllegalArgumentException("セッションが切れています"))

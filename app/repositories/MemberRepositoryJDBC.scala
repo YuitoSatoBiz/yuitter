@@ -55,9 +55,11 @@ class MemberRepositoryJDBC @Inject()(val bCrypt: BCryptPasswordEncoder)(implicit
     }
       .result
       .map { rows =>
-        val member = rows.map(_._1).head
+        val member = rows.map(_._1).headOption
         val accounts = rows.map(_._2).map(AccountView.from)
-        Option.apply(MemberView.from(member, accounts))
+        member.map{ member =>
+          MemberView.from(member, accounts)
+        }
       }
   }
 }

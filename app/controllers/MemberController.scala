@@ -30,19 +30,19 @@ class MemberController @Inject()(val memberService: MemberService)(implicit ec: 
         memberService.create(form).map { _ =>
           Ok(Json.obj("result" -> "success"))
         }.recover { case e =>
-          Ok(Json.obj("result" -> e.getMessage))
+          BadRequest(Json.obj("result" -> e.getMessage))
         }
       }
     )
   }
 
   /**
-    * サインイン中の会員情報を取得 GET /api/current_member
+    * サインイン中の会員情報を取得 GET /api/members/current
     *
     * @return サインイン中の会員情報
     */
-  def findCurrentMember: Action[AnyContent] = Action.async { implicit rs =>
-    memberService.findCurrentMemberWithAccounts.map { member =>
+  def findCurrent: Action[AnyContent] = Action.async { implicit rs =>
+    memberService.findCurrentWithAccounts.map { member =>
       Ok(Json.toJson(member))
     }.recover { case e =>
       BadRequest(Json.obj("result" -> "failure", "error" -> e.getMessage))

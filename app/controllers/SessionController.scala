@@ -2,13 +2,15 @@ package controllers
 
 import java.util.UUID
 import javax.inject.Inject
+
 import formats.MemberCommand
 import play.api.libs.json.{JsError, JsValue}
 import play.api.mvc.{Action, AnyContent, Controller}
 import play.api.libs.json._
 import play.api.cache._
 import services.MemberService
-import scala.concurrent.duration._
+import utils.Consts
+
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
@@ -34,7 +36,7 @@ class SessionController @Inject()(val memberService: MemberService, val cache: C
         memberService.authenticate(form).map { member =>
           val token = UUID.randomUUID().toString
           val memberId = member.memberId
-          cache.set(token, memberId, 30.days)
+          cache.set(token, memberId, Consts.CacheRetentionPeriod)
           Ok(Json.obj("result" -> "success")).withSession(
             rs.session + ("token" -> token))
         }.recover { case e =>
