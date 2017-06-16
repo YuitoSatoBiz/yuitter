@@ -1,12 +1,10 @@
 package controllers
 
 import javax.inject.Inject
-
 import formats.MemberCommand
 import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent, Controller}
 import services.MemberService
-
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
@@ -46,7 +44,7 @@ class MemberController @Inject()(val memberService: MemberService)(implicit ec: 
   def findCurrentMember: Action[AnyContent] = Action.async { implicit rs =>
     memberService.findCurrentMemberWithAccounts.map { member =>
       Ok(Json.toJson(member))
-    }.recover{ case e =>
+    }.recover { case e =>
       BadRequest(Json.obj("result" -> "failure", "error" -> e.getMessage))
     }
   }

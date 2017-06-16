@@ -3,14 +3,12 @@ package repositories
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import javax.inject.Inject
-
 import formats.{AccountView, MemberCommand, MemberView}
 import models.Tables.{Account, Member}
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import slick.driver.MySQLDriver.api._
 import models.Tables.{AccountRow, MemberRow}
 import utils.Consts
-
 import scala.concurrent.ExecutionContext
 
 /**
