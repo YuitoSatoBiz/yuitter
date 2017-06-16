@@ -3,9 +3,8 @@ package repositories
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import javax.inject.Inject
-
-import formats.{AccountCommand, AccountView, TweetCommand, TweetView}
-import models.Tables.{Account, AccountFollowing, AccountRow, AccountTweet, AccountTweetRow, Tweet, TweetRow}
+import formats.{AccountCommand, AccountView}
+import models.Tables.{Account, AccountFollowing, AccountRow}
 import slick.driver.MySQLDriver.api._
 import utils.Consts
 
@@ -85,5 +84,11 @@ class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
       .filter(a => a.accountId === accountId && a.versionNo == form.versionNo)
       .map(a => (a.accountName, a.avatar, a.backgroundImage, a.versionNo, a.updateDatetime))
       .update(form.accountName, form.avatar, form.backgroundImage, form.versionNo.get, Timestamp.valueOf(LocalDateTime.now))
+  }
+
+  def delete(accountId: Long, memberId: Long): DBIO[Int] = {
+    Account
+      .filter(a => a.accountId === accountId && a.memberId === memberId)
+      .delete
   }
 }

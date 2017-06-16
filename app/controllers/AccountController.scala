@@ -1,13 +1,11 @@
 package controllers
 
 import javax.inject.Inject
-
-import formats.{AccountCommand, KeywordCommand, TweetCommand}
+import formats.{AccountCommand, KeywordCommand}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent, Controller}
 import services.{AccountService, MemberService}
-
 import scala.concurrent.Future
 
 
@@ -62,14 +60,14 @@ class AccountController @Inject()(val accountService: AccountService, val member
       valid = { form =>
         accountService.create(form).map { _ =>
           Ok(Json.obj("result" -> "success"))
-        }.recover{ case e =>
+        }.recover { case e =>
           BadRequest(Json.obj("result" -> "failure", "error" -> e.getMessage))
         }
       }
     )
   }
 
-  def update(accountId: Long): Action[JsValue] = Action.async(parse.json) {implicit rs =>
+  def update(accountId: Long): Action[JsValue] = Action.async(parse.json) { implicit rs =>
     rs.body.validate[AccountCommand].fold(
       invalid = { e =>
         Future.successful(
@@ -79,11 +77,18 @@ class AccountController @Inject()(val accountService: AccountService, val member
       valid = { form =>
         accountService.update(accountId, form).map { _ =>
           Ok(Json.obj("result" -> "success"))
-        }.recover{ case e =>
-        BadRequest(Json.obj("result" -> "failure", "error" -> e.getMessage))}
+        }.recover { case e =>
+          BadRequest(Json.obj("result" -> "failure", "error" -> e.getMessage))
+        }
       }
     )
   }
 
-  def delete(accountId: Long) = ???
+  def delete(accountId: Long): Action[AnyContent] = Action.async { implicit rs =>
+    accountService.delete(accountId).map { _ =>
+      Ok(Json.obj("result" -> "success"))
+    }.recover { case e =>
+      BadRequest(Json.obj("result" -> "failure", "error" -> e.getMessage))
+    }
+  }
 }
