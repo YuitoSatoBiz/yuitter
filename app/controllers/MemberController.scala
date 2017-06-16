@@ -4,7 +4,7 @@ import javax.inject.Inject
 
 import formats.MemberCommand
 import play.api.libs.json._
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{Action, AnyContent, Controller}
 import services.MemberService
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -34,5 +34,13 @@ class MemberController @Inject()(val memberService: MemberService)(implicit ec: 
         }
       }
     )
+  }
+
+  def find: Action[AnyContent] = Action.async { implicit rs =>
+    memberService.findCurrentMemberWithAccounts.map { member =>
+      Ok(Json.toJson(member))
+    }.recover{ case e =>
+      BadRequest(Json.obj("result" -> "failure", "error" -> e.getMessage))
+    }
   }
 }

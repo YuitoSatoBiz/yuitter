@@ -3,12 +3,14 @@ package repositories
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import javax.inject.Inject
-import formats.MemberCommand
+
+import formats.{AccountView, MemberCommand, MemberView}
 import models.Tables.{Account, Member}
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import slick.driver.MySQLDriver.api._
 import models.Tables.{AccountRow, MemberRow}
 import utils.Consts
+
 import scala.concurrent.ExecutionContext
 
 /**
@@ -50,6 +52,24 @@ class MemberRepositoryJDBC @Inject()(val bCrypt: BCryptPasswordEncoder)(implicit
   }
 
   def findById(memberId: Long): DBIO[Option[Member#TableElementType]] = {
-    Member.filter(_.memberId === memberId).result.headOption
+    Member.filter(_.memberId === memberId)
+      .result
+      .headOption
+  }
+
+  def findByIdWithAccounts(memberId: Long): DBIO[Option[MemberView]] = {
+    Member.join(
+      Account
+    ).on { case (m, a) =>
+      m.memberId === a.memberId
+    }.filter { case (m, _) =>
+      m.memberId === memberId
+    }
+      .result
+      .map { rows =>
+        val member = rows.map(_._1).head
+        val accounts = rows.map(_._2).map(AccountView.from)
+        Option.apply(MemberView.from(member, accounts))
+      }
   }
 }
