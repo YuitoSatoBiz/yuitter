@@ -4,8 +4,8 @@ import java.sql.Timestamp
 import java.time.LocalDateTime
 import javax.inject.Inject
 
-import formats.{AccountView, TweetCommand, TweetView}
-import models.Tables.{Account, AccountFollowing, AccountTweet, AccountTweetRow, Tweet, TweetRow}
+import formats.{AccountCommand, AccountView, TweetCommand, TweetView}
+import models.Tables.{Account, AccountFollowing, AccountRow, AccountTweet, AccountTweetRow, Tweet, TweetRow}
 import slick.driver.MySQLDriver.api._
 import utils.Consts
 
@@ -65,5 +65,18 @@ class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
       .map(_.map{ a =>
         AccountView.from(a)
       })
+  }
+
+  def create(form: AccountCommand, memberId: Long): DBIO[Int] = {
+    Account += AccountRow(
+      accountId = Consts.DefaultId,
+      memberId = memberId,
+      accountName = form.accountName,
+      avatar = form.avatar,
+      backgroundImage = form.backgroundImage,
+      registerDatetime = Timestamp.valueOf(LocalDateTime.now),
+      updateDatetime = Timestamp.valueOf(LocalDateTime.now),
+      versionNo = Consts.DefaultVersionNo
+    )
   }
 }

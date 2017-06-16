@@ -2,11 +2,11 @@ package controllers
 
 import javax.inject.Inject
 
-import formats.KeywordCommand
+import formats.{AccountCommand, KeywordCommand}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent, Controller}
-import services.AccountService
+import services.{AccountService, MemberService}
 
 import scala.concurrent.Future
 
@@ -16,9 +16,9 @@ import scala.concurrent.Future
   *
   * @author yuito.sato
   */
-class AccountController @Inject()(val accountService: AccountService) extends Controller {
+class AccountController @Inject()(val accountService: AccountService, val memberService: MemberService) extends Controller {
 
-  def search: Action[JsValue] = Action.async(parse.json) { implicit  rs =>
+  def search: Action[JsValue] = Action.async(parse.json) { implicit rs =>
     rs.body.validate[KeywordCommand].fold(
       invalid = { e =>
         Future.successful(
@@ -34,7 +34,7 @@ class AccountController @Inject()(val accountService: AccountService) extends Co
   }
 
   def listFollowers(accountId: Long): Action[AnyContent] = Action.async { implicit rs =>
-    accountService.listFollowers(accountId).map{ followers =>
+    accountService.listFollowers(accountId).map { followers =>
       Ok(Json.toJson(followers))
     }
   }
@@ -52,7 +52,20 @@ class AccountController @Inject()(val accountService: AccountService) extends Co
     }
   }
 
-  def create = ???
+  def create: Action[JsValue] = Action.async(parse.json) { implicit rs =>
+    rs.body.validate[AccountCommand].fold(
+      invalid = { e =>
+        Future.successful(
+          BadRequest(Json.obj("result" -> "failure", "error" -> JsError.toJson(e)))
+        )
+      },
+      valid = { form =>
+        accountService.create(form).map { _ =>
+          Ok(Json.obj("result" -> "success"))
+        }
+      }
+    )
+  }
 
   def update(accountId: Long) = ???
 
