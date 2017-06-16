@@ -37,7 +37,7 @@ class MemberController @Inject()(val memberService: MemberService)(implicit ec: 
   }
 
   /**
-    * サインイン中の会員情報を取得 GET /api/my_page
+    * サインイン中の会員情報を取得 GET /api/current_member
     *
     * @return サインイン中の会員情報
     */
