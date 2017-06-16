@@ -1,7 +1,6 @@
 package services
 
 import javax.inject.Inject
-
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import formats.{MemberCommand, MemberView}
 import play.api.libs.json.JsValue
@@ -10,7 +9,6 @@ import repositories.MemberRepositoryJDBC
 import models.Tables.Member
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import play.api.cache.CacheApi
-
 import scala.concurrent.{ExecutionContext, Future}
 import slick.driver.JdbcProfile
 
@@ -28,23 +26,15 @@ class MemberService @Inject()(val memberJdbc: MemberRepositoryJDBC, val dbConfig
     } yield createMember
   }
 
-  def findCurrentMember(implicit rs: Request[JsValue]): Future[Option[Member#TableElementType]] = {
-    val memberId = for {
+  def findCurrentMemberId(implicit rs: Request[AnyContent]): Option[Long] = {
+    for {
       token <- rs.session.get("token")
       memberId <- cache.get[Int](token)
     } yield memberId
-    db.run(memberJdbc.findById(
-      memberId.getOrElse(throw new IllegalArgumentException("セッションが切れています"))
-    ))
   }
 
   def findCurrentMemberWithAccounts(implicit rs: Request[AnyContent]): Future[Option[MemberView]] = {
-    val memberId = for {
-      token <- rs.session.get("token")
-      memberId <- cache.get[Long](token)
-    } yield memberId
-
-    memberId.map(memberJdbc.findByIdWithAccounts) match {
+    findCurrentMemberId.map(memberJdbc.findByIdWithAccounts) match {
       case Some(dbio) => db.run(dbio)
       case None => Future.failed(new IllegalArgumentException("セッションが切れています"))
     }

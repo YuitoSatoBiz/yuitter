@@ -51,12 +51,6 @@ class MemberRepositoryJDBC @Inject()(val bCrypt: BCryptPasswordEncoder)(implicit
     Member.filter(_.emailAddress === emailAddress).result.headOption
   }
 
-  def findById(memberId: Long): DBIO[Option[Member#TableElementType]] = {
-    Member.filter(_.memberId === memberId)
-      .result
-      .headOption
-  }
-
   def findByIdWithAccounts(memberId: Long): DBIO[Option[MemberView]] = {
     Member.join(
       Account
