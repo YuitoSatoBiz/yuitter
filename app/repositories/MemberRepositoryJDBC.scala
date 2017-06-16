@@ -18,10 +18,6 @@ import scala.concurrent.ExecutionContext
   */
 class MemberRepositoryJDBC @Inject()(val bCrypt: BCryptPasswordEncoder)(implicit ec: ExecutionContext) {
 
-  def countByEmailAddress(emailAddress: String): DBIO[Int] = {
-    Member.filter(_.emailAddress === emailAddress).length.result
-  }
-
   def create(form: MemberCommand): DBIO[(Long, Int)] = {
     (for {
       memberId <- Member returning Member.map(_.memberId) += MemberRow(

@@ -18,11 +18,14 @@ import slick.driver.JdbcProfile
   */
 class MemberService @Inject()(val memberJdbc: MemberRepositoryJDBC, val dbConfigProvider: DatabaseConfigProvider, val cache: CacheApi, val bCrypt: BCryptPasswordEncoder)(implicit ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
 
-  def create(form: MemberCommand): Future[(Long, Int)] = {
+  def create(form: MemberCommand): Future[Unit] = {
+    if (form.password.length <= 8) {
+      return Future.failed(new IllegalArgumentException("8文字未満のパスワードは登録できません。"))
+    }
     for {
-      countByEmailAddress <- db.run(memberJdbc.countByEmailAddress(form.emailAddress))
-      createMember <- db.run(memberJdbc.create(form)) if countByEmailAddress.equals(0)
-    } yield createMember
+      emailAddress <- db.run(memberJdbc.findByEmailAddress(form.emailAddress))
+      _ <- if (emailAddress.isEmpty) db.run(memberJdbc.create(form)) else Future.failed(new IllegalArgumentException("このメールアドレスはすでに使用されています。"))
+    } yield ()
   }
 
   /**

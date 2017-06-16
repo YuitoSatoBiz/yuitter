@@ -29,8 +29,8 @@ class MemberController @Inject()(val memberService: MemberService)(implicit ec: 
       valid = { form =>
         memberService.create(form).map { _ =>
           Ok(Json.obj("result" -> "success"))
-        }.recover { case _ =>
-          Ok(Json.obj("result" -> "このメールアドレスは既に登録されています。"))
+        }.recover { case e =>
+          Ok(Json.obj("result" -> e.getMessage))
         }
       }
     )
