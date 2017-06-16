@@ -38,5 +38,12 @@ class AccountService @Inject()(val accountJdbc: AccountRepositoryJDBC, val dbCon
       _ <- db.run(accountJdbc.create(form, memberId))
     } yield ()
   }
-}
 
+  def update(accountId: Long, form: AccountCommand): Future[Unit] = {
+    for {
+      _ <- Future.successful(memberService.findCurrentMemberId.getOrElse(throw new IllegalArgumentException("アカウントを作成するにはログインが必要です。")))
+      versionNo <- Future.successful(form.versionNo.getOrElse(throw new IllegalArgumentException("バージョン番号がありません。")))
+      _ <- db.run(accountJdbc.update(accountId, versionNo, form))
+    } yield ()
+  }
+}

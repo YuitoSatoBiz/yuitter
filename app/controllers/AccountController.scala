@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject.Inject
 
-import formats.{AccountCommand, KeywordCommand}
+import formats.{AccountCommand, KeywordCommand, TweetCommand}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent, Controller}
@@ -62,12 +62,28 @@ class AccountController @Inject()(val accountService: AccountService, val member
       valid = { form =>
         accountService.create(form).map { _ =>
           Ok(Json.obj("result" -> "success"))
+        }.recover{ case e =>
+          BadRequest(Json.obj("result" -> "failure", "error" -> e.getMessage))
         }
       }
     )
   }
 
-  def update(accountId: Long) = ???
+  def update(accountId: Long): Action[JsValue] = Action.async(parse.json) {implicit rs =>
+    rs.body.validate[AccountCommand].fold(
+      invalid = { e =>
+        Future.successful(
+          BadRequest(Json.obj("result" -> "failure", "error" -> JsError.toJson(e)))
+        )
+      },
+      valid = { form =>
+        accountService.update(accountId, form).map { _ =>
+          Ok(Json.obj("result" -> "success"))
+        }.recover{ case e =>
+        BadRequest(Json.obj("result" -> "failure", "error" -> e.getMessage))}
+      }
+    )
+  }
 
   def delete(accountId: Long) = ???
 }

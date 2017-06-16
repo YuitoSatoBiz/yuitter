@@ -20,9 +20,9 @@ class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
 
   def search(keyword: String): DBIO[Seq[AccountView]] = {
     Account
-      .filter(_.accountName like "%" + "%")
+      .filter(_.accountName like "%" + keyword + "%")
       .result
-      .map(_.map{ a =>
+      .map(_.map { a =>
         AccountView.from(a)
       })
   }
@@ -30,14 +30,14 @@ class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
   def listFollowers(accountId: Long): DBIO[Seq[AccountView]] = {
     Account
       .join(AccountFollowing)
-      .on{ case (a, af) =>
+      .on { case (a, af) =>
         a.accountId === af.followeeId
       }
-      .filter{ case (_, af) =>
-          af.followeeId === accountId
+      .filter { case (_, af) =>
+        af.followeeId === accountId
       }
       .result
-      .map(_.map{ case (a, _) =>
+      .map(_.map { case (a, _) =>
         AccountView.from(a)
       })
   }
@@ -45,14 +45,14 @@ class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
   def listFollowees(accountId: Long): DBIO[Seq[AccountView]] = {
     Account
       .join(AccountFollowing)
-      .on{ case (a, af) =>
+      .on { case (a, af) =>
         a.accountId === af.followerId
       }
-      .filter{ case (_, af) =>
+      .filter { case (_, af) =>
         af.followerId === accountId
       }
       .result
-      .map(_.map{ case (a, _) =>
+      .map(_.map { case (a, _) =>
         AccountView.from(a)
       })
   }
@@ -62,7 +62,7 @@ class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
       .filter(_.accountId === accountId)
       .result
       .headOption
-      .map(_.map{ a =>
+      .map(_.map { a =>
         AccountView.from(a)
       })
   }
@@ -78,5 +78,12 @@ class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
       updateDatetime = Timestamp.valueOf(LocalDateTime.now),
       versionNo = Consts.DefaultVersionNo
     )
+  }
+
+  def update(accountId: Long, versionNo: Long, form: AccountCommand): DBIO[Int] = {
+    Account
+      .filter(a => a.accountId === accountId && a.versionNo == form.versionNo)
+      .map(a => (a.accountName, a.avatar, a.backgroundImage, a.versionNo, a.updateDatetime))
+      .update(form.accountName, form.avatar, form.backgroundImage, form.versionNo.get, Timestamp.valueOf(LocalDateTime.now))
   }
 }
