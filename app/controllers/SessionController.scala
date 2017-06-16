@@ -18,6 +18,11 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 class SessionController @Inject()(val memberService: MemberService, val cache: CacheApi)(implicit ec: ExecutionContext) extends Controller {
 
+  /**
+    * サインイン POST /api/sign_in
+    *
+    * @return サインイン処理の結果
+    */
   def create: Action[JsValue] = Action.async(parse.json) { implicit rs =>
     rs.body.validate[MemberCommand].fold(
       invalid = { e =>
@@ -39,6 +44,11 @@ class SessionController @Inject()(val memberService: MemberService, val cache: C
     )
   }
 
+  /**
+    * サインアウト GET /api/sign_out
+    *
+    * @return サインアウト処理の結果
+    */
   def delete: Action[AnyContent] = Action.async { implicit rs =>
     Future {
       rs.session.get("token").getOrElse {

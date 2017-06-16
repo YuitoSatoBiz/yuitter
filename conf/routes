@@ -18,7 +18,7 @@ DELETE        /api/tweets/:tweetId        controllers.TweetController.delete(twe
 
 # MemberAPI
 POST          /api/members                controllers.MemberController.create
-GET           /api/my_page                controllers.MemberController.find
+GET           /api/my_page                controllers.MemberController.findCurrentMember
 
 # SessionAPI
 POST          /api/sign_in                controllers.SessionController.create

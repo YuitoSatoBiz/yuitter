@@ -18,6 +18,8 @@ class MemberController @Inject()(val memberService: MemberService)(implicit ec: 
 
   /**
     * Memberを登録 POST /api/members
+    *
+    * @return 登録処理の結果
     */
   def create: Action[JsValue] = Action.async(parse.json) { implicit rs =>
     rs.body.validate[MemberCommand].fold(
@@ -36,7 +38,12 @@ class MemberController @Inject()(val memberService: MemberService)(implicit ec: 
     )
   }
 
-  def find: Action[AnyContent] = Action.async { implicit rs =>
+  /**
+    * サインイン中の会員情報を取得 GET /api/my_page
+    *
+    * @return サインイン中の会員情報
+    */
+  def findCurrentMember: Action[AnyContent] = Action.async { implicit rs =>
     memberService.findCurrentMemberWithAccounts.map { member =>
       Ok(Json.toJson(member))
     }.recover{ case e =>
