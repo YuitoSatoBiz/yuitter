@@ -41,4 +41,19 @@ class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
         AccountView.from(a)
       })
   }
+
+  def listFollowees(accountId: Long): DBIO[Seq[AccountView]] = {
+    Account
+      .join(AccountFollowing)
+      .on{ case (a, af) =>
+        a.accountId === af.followerId
+      }
+      .filter{ case (_, af) =>
+        af.followerId === accountId
+      }
+      .result
+      .map(_.map{ case (a, _) =>
+        AccountView.from(a)
+      })
+  }
 }

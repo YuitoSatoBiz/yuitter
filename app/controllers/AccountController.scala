@@ -24,7 +24,6 @@ class AccountController @Inject()(val accountService: AccountService) extends Co
         Future.successful(
           BadRequest(Json.obj("result" -> "failure", "error" -> JsError.toJson(e)))
         )
-
       },
       valid = { form =>
         accountService.search(form).map { accounts =>
@@ -34,11 +33,17 @@ class AccountController @Inject()(val accountService: AccountService) extends Co
     )
   }
 
-  def listFollowers(accountId: Long) = Action.async { implicit rs =>
-    accountService.listFollowers(accountId).map
+  def listFollowers(accountId: Long): Action[AnyContent] = Action.async { implicit rs =>
+    accountService.listFollowers(accountId).map{ followers =>
+      Ok(Json.toJson(followers))
+    }
   }
 
-  def listFollowees(accountId: Long) = ???
+  def listFollowees(accountId: Long): Action[AnyContent] = Action.async { implicit rs =>
+    accountService.listFollowers(accountId).map { followers =>
+      Ok(Json.toJson(followers))
+    }
+  }
 
   def find(accountId: Long) = ???
 
