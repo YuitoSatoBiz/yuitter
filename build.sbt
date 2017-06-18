@@ -16,7 +16,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.slick" %% "slick-codegen" % "3.1.0",
   "org.slf4j" % "slf4j-nop" % "1.6.4",
   "org.springframework.security" % "spring-security-web" % "4.2.3.RELEASE",
-  cache
+  cache,
+  filters
 )
 
 // code generation task
