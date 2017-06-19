@@ -82,7 +82,7 @@ class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
     Account
       .filter(a => (a.accountId === accountId.bind) && (a.memberId === memberId.bind) && (a.versionNo === form.versionNo.bind))
       .map(a => (a.accountName, a.avatar, a.backgroundImage, a.versionNo, a.updateDatetime))
-      .update(form.accountName.get, form.avatar, form.backgroundImage, form.versionNo + 1, Timestamp.valueOf(LocalDateTime.now))
+      .update(form.accountName.get, form.avatar, form.backgroundImage, form.versionNo + 1L, Timestamp.valueOf(LocalDateTime.now))
   }
 
   def delete(accountId: Long, memberId: Long): DBIO[Int] = {
