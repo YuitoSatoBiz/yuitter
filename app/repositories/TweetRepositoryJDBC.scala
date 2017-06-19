@@ -3,10 +3,12 @@ package repositories
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import javax.inject.Inject
-import formats.{AccountView, TweetCommand, TweetView}
+
+import formats.{AccountView, TweetCreateCommand, TweetUpdateCommand, TweetView}
 import models.Tables.{Account, AccountFollowing, AccountTweet, AccountTweetRow, Tweet, TweetRow}
 import slick.driver.MySQLDriver.api._
 import utils.Consts
+
 import scala.concurrent.ExecutionContext
 
 /**
@@ -16,7 +18,7 @@ import scala.concurrent.ExecutionContext
   */
 class TweetRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
 
-  def list(accountId: Long, memberId: Long): DBIO[Seq[TweetView]] = {
+  def list(accountId: Long): DBIO[Seq[TweetView]] = {
     val subAccount = Account.join(AccountFollowing).on { case (a, af) =>
       a.accountId === af.followeeId
     }
@@ -67,7 +69,7 @@ class TweetRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
       }
   }
 
-  def create(form: TweetCommand): DBIO[(Long, Option[Int])] = {
+  def create(form: TweetCreateCommand): DBIO[(Long, Option[Int])] = {
     (for {
       tweet <- Tweet returning Tweet.map(_.tweetId) += TweetRow(
         tweetId = Consts.DefaultId,
@@ -77,7 +79,7 @@ class TweetRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
         updateDatetime = Timestamp.valueOf(LocalDateTime.now),
         versionNo = Consts.DefaultVersionNo
       )
-      accountTweet <- AccountTweet ++= form.accountIds.get.map { aid =>
+      accountTweet <- AccountTweet ++= form.accountIds.map { aid =>
         AccountTweetRow(
           accountTweetId = Consts.DefaultId,
           accountId = aid,
@@ -88,7 +90,7 @@ class TweetRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
     } yield (tweet, accountTweet)).transactionally
   }
 
-  def update(tweetId: Long, form: TweetCommand): DBIO[Int] = {
+  def update(tweetId: Long, form: TweetUpdateCommand): DBIO[Int] = {
     Tweet
       .filter(t => (t.tweetId === tweetId.bind) && (t.versionNo === form.versionNo))
       .map(t => (t.tweetText, t.updateDatetime))

@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject.Inject
 
-import formats.TweetCommand
+import formats.{TweetCreateCommand, TweetUpdateCommand}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent, Controller}
@@ -48,7 +48,7 @@ class TweetController @Inject()(val tweetService: TweetService, val authenticate
     * @return Action[JsValue]
     */
   def create: Action[JsValue] = authenticatedAction.async(parse.json) { implicit rs =>
-    rs.body.validate[TweetCommand].fold(
+    rs.body.validate[TweetCreateCommand].fold(
       invalid = { e =>
         Future.successful(
           BadRequest(Json.obj("result" -> "failure", "error" -> JsError.toJson(e)))
@@ -69,7 +69,7 @@ class TweetController @Inject()(val tweetService: TweetService, val authenticate
     * @return Action[JsValue]
     */
   def update(tweetId: Long): Action[JsValue] = authenticatedAction.async(parse.json) { implicit rs =>
-    rs.body.validate[TweetCommand].fold(
+    rs.body.validate[TweetUpdateCommand].fold(
       invalid = { e =>
         Future.successful(
           BadRequest(Json.obj("result" -> "failure", "error" -> JsError.toJson(e)))

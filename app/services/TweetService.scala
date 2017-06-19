@@ -2,8 +2,9 @@ package services
 
 import javax.inject.Inject
 
-import formats.{TweetCommand, TweetView}
+import formats.{TweetCreateCommand, TweetUpdateCommand, TweetView}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
+import play.api.libs.json.JsValue
 import play.api.mvc.AnyContent
 import repositories.TweetRepositoryJDBC
 import security.AuthenticatedRequest
@@ -23,7 +24,7 @@ class TweetService @Inject()(val tweetJdbc: TweetRepositoryJDBC, val accountServ
       accounts <- accountService.listByMemberId(rs.memberId)
       tweets <- {
         if (accounts.map(a => a.accountId).contains(accountId)) {
-          db.run(tweetJdbc.list(accountId, rs.memberId))
+          db.run(tweetJdbc.list(accountId))
         } else {
           Future.failed(new IllegalArgumentException("不正なアカウントIDです。"))
         }
@@ -35,11 +36,20 @@ class TweetService @Inject()(val tweetJdbc: TweetRepositoryJDBC, val accountServ
     db.run(tweetJdbc.find(tweetId: Long))
   }
 
-  def create(form: TweetCommand): Future[(Long, Option[Int])] = {
-    db.run(tweetJdbc.create(form))
+  def create(form: TweetCreateCommand)(implicit rs: AuthenticatedRequest[JsValue]): Future[Unit] = {
+    for {
+      accounts <- accountService.listByMemberId(rs.memberId)
+      _ <- {
+        if (accounts.map(a => a.accountId).exists(id => form.accountIds.contains(id))) {
+          db.run(tweetJdbc.create(form))
+        } else {
+          Future.failed(new IllegalArgumentException("不正なアカウントIDです。"))
+        }
+      }
+    } yield ()
   }
 
-  def update(tweetId: Long, form: TweetCommand): Future[Int] = {
+  def update(tweetId: Long, form: TweetUpdateCommand)(implicit rs: AuthenticatedRequest[JsValue]): Future[Int] = {
     db.run(tweetJdbc.update(tweetId, form))
   }
 
