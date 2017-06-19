@@ -32,14 +32,14 @@ class MemberService @Inject()(val memberJdbc: MemberRepositoryJDBC, val dbConfig
     * @param rs クライアントからのリクエスト
     * @return キャッシュから取得したMemberテーブルのmemberId
     */
-  def findCurrentMemberId(implicit rs: Request[AnyContent]): Option[Long] = {
+  def findCurrentMemberId(implicit rs: Request[_]): Option[Long] = {
     for {
       token <- rs.session.get("token")
       memberId <- cache.get[Long](token)
     } yield memberId
   }
 
-  def findCurrentWithAccounts(implicit rs: Request[AnyContent]): Future[Option[MemberView]] = {
+  def findCurrentWithAccounts(implicit rs: Request[_]): Future[Option[MemberView]] = {
     findCurrentMemberId.map(memberJdbc.findByIdWithAccounts) match {
       case Some(dbio) => db.run(dbio)
       case None => Future.failed(new IllegalArgumentException("セッションが切れています"))

@@ -19,12 +19,12 @@ object AccountView {
 
   implicit val accountViewWrites: Writes[AccountView] = Json.writes[AccountView]
 
-  def from(a: Account#TableElementType): AccountView = {
+  def from(account: Account#TableElementType): AccountView = {
     AccountView(
-      accountId = a.accountId,
-      accountName = a.accountName,
-      avatar = a.avatar,
-      backgroundImage = a.backgroundImage
+      accountId = account.accountId,
+      accountName = account.accountName,
+      avatar = account.avatar,
+      backgroundImage = account.backgroundImage
     )
   }
 }

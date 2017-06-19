@@ -14,7 +14,7 @@ case class MemberCommand(
   emailAddress: String,
   password: String,
   versionNo: Option[Long],
-  account: Option[AccountCommand]
+  account: Option[AccountCreateCommand]
 )
 
 object MemberCommand {
@@ -23,6 +23,6 @@ object MemberCommand {
     (JsPath \ "emailAddress").read[String](maxLength[String](Consts.EmailAddressMaxLength)) and
     (JsPath \ "password").read[String](minLength[String](Consts.PasswordMinLength)) and
     (JsPath \ "versionNo").readNullable[Long] and
-    (JsPath \ "account").readNullable[AccountCommand]
+    (JsPath \ "account").readNullable[AccountCreateCommand]
     ) (MemberCommand.apply _)
 }
