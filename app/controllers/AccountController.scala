@@ -108,8 +108,6 @@ class AccountController @Inject()(val authenticatedAction: AuthenticatedAction, 
       valid = { form =>
         accountService.update(accountId, form).map { _ =>
           Ok(Json.obj("result" -> "success"))
-        }.recover { case e =>
-          BadRequest(Json.obj("result" -> "failure", "error" -> e.getMessage))
         }
       }
     )
