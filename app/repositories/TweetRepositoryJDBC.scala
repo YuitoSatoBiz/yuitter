@@ -3,12 +3,13 @@ package repositories
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import javax.inject.Inject
-
 import formats.{AccountView, TweetCreateCommand, TweetUpdateCommand, TweetView}
-import models.Tables.{Account, AccountFollowing, AccountTweet, AccountTweetRow, Tweet, TweetRow}
+import models.Tables.{Account, AccountFollowing, AccountTweet, AccountTweetRow, Member, Tweet, TweetRow}
+import play.api.libs.json.JsValue
+import play.api.mvc.AnyContent
+import security.AuthenticatedRequest
 import slick.driver.MySQLDriver.api._
 import utils.Consts
-
 import scala.concurrent.ExecutionContext
 
 /**
@@ -26,20 +27,20 @@ class TweetRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
       at.accountId === a.accountId
     }
     Tweet
-      .join(subAccountTweet).on { case (t, (at, (_, _))) => t.tweetId === at.tweetId }
+      .join(subAccountTweet).on { case (t, (at, _)) => t.tweetId === at.tweetId }
       .filter { case (_, (_, (_, af))) =>
         af.followerId === accountId.bind
       }
-      .sortBy { case (t, (_, (_, _))) =>
+      .sortBy { case (t, _) =>
         t.registerDatetime.desc
       }
       .result
       .map {
         rows =>
-          rows.map { case (t, (_, (_, _))) =>
+          rows.map { case (t, _) =>
             t.tweetId
           }.distinct.map { tweetId =>
-            rows.groupBy { case (t, (_, (_, _))) =>
+            rows.groupBy { case (t, _) =>
               t.tweetId
             }.filter { case (id, _) =>
               id == tweetId
@@ -51,8 +52,6 @@ class TweetRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
           }.toSeq)
       }
   }
-
-  // TODO(yuito)自分がフォローしているユーザーを含める
 
   def find(tweetId: Long): DBIO[Option[TweetView]] = {
     val subAccountTweet = AccountTweet.join(Account).on {
@@ -73,7 +72,6 @@ class TweetRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
     (for {
       tweet <- Tweet returning Tweet.map(_.tweetId) += TweetRow(
         tweetId = Consts.DefaultId,
-        // TODO(yuito) ログイン中のメンバーのAccountIdしかおくれないようにする
         tweetText = form.tweetText,
         registerDatetime = Timestamp.valueOf(LocalDateTime.now),
         updateDatetime = Timestamp.valueOf(LocalDateTime.now),
@@ -90,21 +88,38 @@ class TweetRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
     } yield (tweet, accountTweet)).transactionally
   }
 
-  def update(tweetId: Long, form: TweetUpdateCommand): DBIO[Int] = {
+  def update(tweetId: Long, form: TweetUpdateCommand)(implicit rs: AuthenticatedRequest[JsValue]): DBIO[Int] = {
+    val subAccount = Account.join(Member).on { case (a, m) =>
+      a.memberId === m.memberId
+    }
+    val subAccountTweet = AccountTweet.join(subAccount).on { case (at, (a, _)) =>
+      at.accountId === a.accountId
+    }
     Tweet
-      .filter(t => (t.tweetId === tweetId.bind) && (t.versionNo === form.versionNo))
-      .map(t => (t.tweetText, t.updateDatetime))
+      .join(subAccountTweet).on { case (t, (at, _)) => t.tweetId === at.tweetId }
+      .filter { case (t, (_, (_, m))) => (t.tweetId === tweetId.bind) && (t.versionNo === form.versionNo) && (m.memberId === rs.memberId) }
+      .map { case (t, _) => (t.tweetText, t.updateDatetime) }
       .update(form.tweetText, Timestamp.valueOf(LocalDateTime.now))
   }
 
-  def delete(tweetId: Long): DBIO[(Int, Int)] = {
-    (for {
-      accountTweet <- AccountTweet
-        .filter(_.tweetId === tweetId)
+  def delete(tweetId: Long)(implicit rs: AuthenticatedRequest[AnyContent]): DBIO[Unit] = {
+    for {
+      _ <- AccountTweet
+        .filter(_ =>
+          Account.filter(a =>
+            a.memberId === rs.memberId
+          ).exists
+        )
         .delete
-      tweet <- Tweet
-        .filter(_.tweetId === tweetId)
+      _ <- Tweet
+        .filter(_ =>
+          AccountTweet.filter(_ =>
+            Account.filter(a =>
+              a.memberId === rs.memberId
+            ).exists
+          ).exists
+        )
         .delete
-    } yield (accountTweet, tweet)).transactionally
+    } yield ()
   }
 }
