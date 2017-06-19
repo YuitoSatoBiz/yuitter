@@ -8,7 +8,7 @@ import play.api.libs.json._
 import scala.concurrent.Future
 
 /**
-  * サインイン認証後のアクションビルダー
+  * サインイン認証のためのアクションビルダー
   *
   * @author yuito.sato
   */
