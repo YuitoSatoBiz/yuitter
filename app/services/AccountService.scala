@@ -5,7 +5,7 @@ import javax.inject.Inject
 
 import formats.{AccountCommand, AccountView, KeywordCommand}
 import play.api.libs.json.JsValue
-import play.api.mvc.{AnyContent, Request}
+import play.api.mvc.AnyContent
 import repositories.AccountRepositoryJDBC
 import security.AuthenticatedRequest
 

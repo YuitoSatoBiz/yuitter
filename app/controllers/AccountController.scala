@@ -9,7 +9,6 @@ import security.AuthenticatedAction
 import services.{AccountService, MemberService}
 import scala.concurrent.Future
 
-
 /**
   * AccountテーブルのCRUD処理をするコントローラー
   *
