@@ -1,11 +1,9 @@
 package services
 
 import javax.inject.Inject
-
 import formats.{TweetCommand, TweetView}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import repositories.TweetRepositoryJDBC
-
 import scala.concurrent.Future
 import slick.driver.JdbcProfile
 

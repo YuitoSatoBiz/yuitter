@@ -9,17 +9,17 @@ GET           /                           controllers.HomeController.index
 # Map static resources from the /public folder to the /assets URL path
 GET           /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
-# Mapping to /tweets
+# TweetAPI
 GET           /api/tweets                 controllers.TweetController.list
-
-# Mapping to /tweets/:tweetId
 GET           /api/tweets/:tweetId        controllers.TweetController.find(tweetId: Long)
-
-# Mapping to /tweets
 POST          /api/tweets                 controllers.TweetController.create
-
-# Mapping to /tweets/:tweetId
 PUT           /api/tweets/:tweetId        controllers.TweetController.update(tweetId: Long)
-
-# Mapping to /tweets/:tweetId
 DELETE        /api/tweets/:tweetId        controllers.TweetController.delete(tweetId: Long)
+
+# MemberAPI
+POST          /api/members                controllers.MemberController.create
+GET           /api/members/current        controllers.MemberController.findCurrent
+
+# SessionAPI
+POST          /api/sign_in                controllers.SessionController.create
+GET           /api/sign_out               controllers.SessionController.delete

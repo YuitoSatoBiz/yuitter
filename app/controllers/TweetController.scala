@@ -1,13 +1,11 @@
 package controllers
 
 import javax.inject.Inject
-
 import formats.TweetCommand
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent, Controller}
 import services.TweetService
-
 import scala.concurrent.Future
 
 /**
@@ -18,7 +16,7 @@ import scala.concurrent.Future
 class TweetController @Inject()(val tweetService: TweetService) extends Controller {
 
   /**
-    * Tweetの一覧取得 GET /tweets
+    * Tweetの一覧取得 GET /api/tweets
     *
     * @return Action[AnyContent]
     */
@@ -29,7 +27,7 @@ class TweetController @Inject()(val tweetService: TweetService) extends Controll
   }
 
   /**
-    * TweetをtweetIdで検索 GET /tweets/:tweetId
+    * TweetをtweetIdで検索 GET /api/tweets/:tweetId
     *
     * @param tweetId 検索するツイートのID
     * @return Action[AnyContent]
@@ -42,7 +40,7 @@ class TweetController @Inject()(val tweetService: TweetService) extends Controll
   }
 
   /**
-    * Tweetを作成 POST /tweets
+    * Tweetを作成 POST /api/tweets
     *
     * @return Action[JsValue]
     */
@@ -62,7 +60,7 @@ class TweetController @Inject()(val tweetService: TweetService) extends Controll
   }
 
   /**
-    * Tweetを更新 PUT /tweets/:tweetId
+    * Tweetを更新 PUT /api/tweets/:tweetId
     *
     * @param tweetId 更新するツイートのID
     * @return Action[JsValue]
@@ -83,7 +81,7 @@ class TweetController @Inject()(val tweetService: TweetService) extends Controll
   }
 
   /**
-    * Tweetを削除 DELETE /tweets/:tweetId
+    * Tweetを削除 DELETE /api/tweets/:tweetId
     *
     * @param tweetId 削除するツイートのID
     * @return

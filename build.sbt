@@ -14,7 +14,9 @@ libraryDependencies ++= Seq(
   "mysql" % "mysql-connector-java" % "5.1.27",
   "com.typesafe.play" %% "play-slick" % "2.0.2",
   "com.typesafe.slick" %% "slick-codegen" % "3.1.0",
-  "org.slf4j" % "slf4j-nop" % "1.6.4"
+  "org.slf4j" % "slf4j-nop" % "1.6.4",
+  "org.springframework.security" % "spring-security-web" % "4.2.3.RELEASE",
+  cache
 )
 
 // code generation task
