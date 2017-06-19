@@ -7,6 +7,7 @@ import formats.{AccountCommand, AccountView, KeywordCommand}
 import play.api.libs.json.JsValue
 import play.api.mvc.{AnyContent, Request}
 import repositories.AccountRepositoryJDBC
+import security.AuthenticatedRequest
 
 import scala.concurrent.{ExecutionContext, Future}
 import slick.driver.JdbcProfile
@@ -16,7 +17,7 @@ import slick.driver.JdbcProfile
   *
   * @author yuito.sato
   */
-class AccountService @Inject()(val accountJdbc: AccountRepositoryJDBC, val dbConfigProvider: DatabaseConfigProvider, val memberService: MemberService)(implicit ec: ExecutionContext)  extends HasDatabaseConfigProvider[JdbcProfile] {
+class AccountService @Inject()(val accountJdbc: AccountRepositoryJDBC, val dbConfigProvider: DatabaseConfigProvider, val memberService: MemberService)(implicit ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
 
   def search(form: KeywordCommand): Future[Seq[AccountView]] = {
     db.run(accountJdbc.search(form.keyword))
@@ -34,25 +35,24 @@ class AccountService @Inject()(val accountJdbc: AccountRepositoryJDBC, val dbCon
     db.run(accountJdbc.find(accountId))
   }
 
-  def create(form: AccountCommand)(implicit rs: Request[JsValue]): Future[Unit] = {
+  def create(form: AccountCommand)(implicit rs: AuthenticatedRequest[JsValue]): Future[Int] = {
+    db.run(accountJdbc.create(form, rs.memberId))
+  }
+
+  def update(accountId: Long, form: AccountCommand)(implicit rs: AuthenticatedRequest[JsValue]): Future[Unit] = {
     for {
-      memberId <- Future.successful(memberService.findCurrentMemberId.getOrElse(throw new IllegalArgumentException("アカウントを作成するにはログインが必要です。")))
-      _ <- db.run(accountJdbc.create(form, memberId))
+      versionNo <- {
+        if (form.versionNo.nonEmpty) {
+          Future.successful(form.versionNo.get)
+        } else {
+          Future.failed(new IllegalArgumentException("バージョン番号がありません。"))
+        }
+      }
+      _ <- db.run(accountJdbc.update(accountId, rs.memberId, versionNo, form))
     } yield ()
   }
 
-  def update(accountId: Long, form: AccountCommand)(implicit rs: Request[JsValue]): Future[Unit] = {
-    for {
-      _ <- Future.successful(memberService.findCurrentMemberId.getOrElse(throw new IllegalArgumentException("アカウントを作成するにはログインが必要です。")))
-      versionNo <- Future.successful(form.versionNo.getOrElse(throw new IllegalArgumentException("バージョン番号がありません。")))
-      _ <- db.run(accountJdbc.update(accountId, versionNo, form))
-    } yield ()
-  }
-
-  def delete(accountId: Long)(implicit rs: Request[AnyContent]): Future[Unit] = {
-    for {
-      memberId <- Future.successful(memberService.findCurrentMemberId.getOrElse(throw new IllegalArgumentException("アカウントを作成するにはログインが必要です。")))
-      _ <- db.run(accountJdbc.delete(accountId, memberId))
-    } yield ()
+  def delete(accountId: Long)(implicit rs: AuthenticatedRequest[AnyContent]): Future[Int] = {
+    db.run(accountJdbc.delete(accountId, rs.memberId))
   }
 }

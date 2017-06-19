@@ -5,6 +5,7 @@ import formats.{AccountCommand, KeywordCommand}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent, Controller}
+import security.AuthenticatedAction
 import services.{AccountService, MemberService}
 import scala.concurrent.Future
 
@@ -14,9 +15,14 @@ import scala.concurrent.Future
   *
   * @author yuito.sato
   */
-class AccountController @Inject()(val accountService: AccountService, val memberService: MemberService) extends Controller {
+class AccountController @Inject()(val authenticatedAction: AuthenticatedAction, val accountService: AccountService, val memberService: MemberService) extends Controller {
 
-  def search: Action[JsValue] = Action.async(parse.json) { implicit rs =>
+  /**
+    * アカウント名でアカウントを検索 POST /api/accounts/search
+    *
+    * @return 検索にマッチしたアカウント一覧
+    */
+  def search: Action[JsValue] = authenticatedAction.async(parse.json) { implicit rs =>
     rs.body.validate[KeywordCommand].fold(
       invalid = { e =>
         Future.successful(
@@ -31,26 +37,49 @@ class AccountController @Inject()(val accountService: AccountService, val member
     )
   }
 
-  def listFollowers(accountId: Long): Action[AnyContent] = Action.async { implicit rs =>
+  /**
+    * フォローされているアカウント（フォロワー）一覧を取得 GET /api/accounts/followers/:accountId
+    *
+    * @param accountId フォローされているアカウントID
+    * @return フォロワー一覧
+    */
+  def listFollowers(accountId: Long): Action[AnyContent] = authenticatedAction.async { implicit rs =>
     accountService.listFollowers(accountId).map { followers =>
       Ok(Json.toJson(followers))
     }
   }
 
-  def listFollowees(accountId: Long): Action[AnyContent] = Action.async { implicit rs =>
+  /**
+    * フォローしているアカウント（フォロイー）一覧を取得 GET /api/accounts/followees/:accountId
+    *
+    * @param accountId フォローしているアカウントID
+    * @return フォロイー一覧
+    */
+  def listFollowees(accountId: Long): Action[AnyContent] = authenticatedAction.async { implicit rs =>
     accountService.listFollowers(accountId).map { followers =>
       Ok(Json.toJson(followers))
     }
   }
 
-  def find(accountId: Long): Action[AnyContent] = Action.async { implicit rs =>
+  /**
+    * IDでアカウントを検索 GET /api/accounts/:accountId
+    *
+    * @param accountId 検索を書けるID
+    * @return 検索にマッチしたアカウント一覧
+    */
+  def find(accountId: Long): Action[AnyContent] = authenticatedAction.async { implicit rs =>
     accountService.find(accountId).map {
       case Some(account) => Ok(Json.toJson(account))
       case None => BadRequest(Json.obj("result" -> "failure", "errors" -> "指定されたIDのアカウントは存在しません"))
     }
   }
 
-  def create: Action[JsValue] = Action.async(parse.json) { implicit rs =>
+  /**
+    * アカウントを追加 POST /api/accounts
+    *
+    * @return 処理の結果
+    */
+  def create: Action[JsValue] = authenticatedAction.async(parse.json) { implicit rs =>
     rs.body.validate[AccountCommand].fold(
       invalid = { e =>
         Future.successful(
@@ -60,14 +89,17 @@ class AccountController @Inject()(val accountService: AccountService, val member
       valid = { form =>
         accountService.create(form).map { _ =>
           Ok(Json.obj("result" -> "success"))
-        }.recover { case e =>
-          BadRequest(Json.obj("result" -> "failure", "error" -> e.getMessage))
         }
       }
     )
   }
 
-  def update(accountId: Long): Action[JsValue] = Action.async(parse.json) { implicit rs =>
+  /**
+    * アカウントを更新 PUT /api/accounts/:accountId
+    *
+    * @return 処理の結果
+    */
+  def update(accountId: Long): Action[JsValue] = authenticatedAction.async(parse.json) { implicit rs =>
     rs.body.validate[AccountCommand].fold(
       invalid = { e =>
         Future.successful(
@@ -84,11 +116,14 @@ class AccountController @Inject()(val accountService: AccountService, val member
     )
   }
 
-  def delete(accountId: Long): Action[AnyContent] = Action.async { implicit rs =>
+  /**
+    * アカウントを削除 DELETE /api/accounts/:accountId
+    *
+    * @return 処理の結果
+    */
+  def delete(accountId: Long): Action[AnyContent] = authenticatedAction.async { implicit rs =>
     accountService.delete(accountId).map { _ =>
       Ok(Json.obj("result" -> "success"))
-    }.recover { case e =>
-      BadRequest(Json.obj("result" -> "failure", "error" -> e.getMessage))
     }
   }
 }

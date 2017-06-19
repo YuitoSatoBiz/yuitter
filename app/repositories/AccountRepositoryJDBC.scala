@@ -7,7 +7,6 @@ import formats.{AccountCommand, AccountView}
 import models.Tables.{Account, AccountFollowing, AccountRow}
 import slick.driver.MySQLDriver.api._
 import utils.Consts
-
 import scala.concurrent.ExecutionContext
 
 /**
@@ -30,10 +29,10 @@ class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
     Account
       .join(AccountFollowing)
       .on { case (a, af) =>
-        a.accountId === af.followeeId
+        a.accountId === af.followerId
       }
       .filter { case (_, af) =>
-        af.followeeId === accountId
+        af.followeeId === accountId.bind
       }
       .result
       .map(_.map { case (a, _) =>
@@ -45,10 +44,10 @@ class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
     Account
       .join(AccountFollowing)
       .on { case (a, af) =>
-        a.accountId === af.followerId
+        a.accountId === af.followeeId
       }
       .filter { case (_, af) =>
-        af.followerId === accountId
+        af.followerId === accountId.bind
       }
       .result
       .map(_.map { case (a, _) =>
@@ -58,7 +57,7 @@ class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
 
   def find(accountId: Long): DBIO[Option[AccountView]] = {
     Account
-      .filter(_.accountId === accountId)
+      .filter(_.accountId === accountId.bind)
       .result
       .headOption
       .map(_.map { a =>
@@ -79,16 +78,16 @@ class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
     )
   }
 
-  def update(accountId: Long, versionNo: Long, form: AccountCommand): DBIO[Int] = {
+  def update(accountId: Long, memberId: Long, versionNo: Long, form: AccountCommand): DBIO[Int] = {
     Account
-      .filter(a => a.accountId === accountId && a.versionNo == form.versionNo)
+      .filter(a => (a.accountId === accountId.bind) && (a.memberId === memberId.bind) && (a.versionNo === form.versionNo.get.bind))
       .map(a => (a.accountName, a.avatar, a.backgroundImage, a.versionNo, a.updateDatetime))
       .update(form.accountName, form.avatar, form.backgroundImage, form.versionNo.get, Timestamp.valueOf(LocalDateTime.now))
   }
 
   def delete(accountId: Long, memberId: Long): DBIO[Int] = {
     Account
-      .filter(a => a.accountId === accountId && a.memberId === memberId)
+      .filter(a => a.accountId === accountId.bind && a.memberId === memberId.bind)
       .delete
   }
 }
