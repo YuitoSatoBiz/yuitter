@@ -35,7 +35,7 @@ class TweetController @Inject()(val tweetService: TweetService, val authenticate
     * @param tweetId 検索するツイートのID
     * @return Action[AnyContent]
     */
-  def find(tweetId: Long): Action[AnyContent] = Action.async { implicit rs =>
+  def find(tweetId: Long): Action[AnyContent] = authenticatedAction.async { implicit rs =>
     tweetService.find(tweetId).map {
       case Some(tweet) => Ok(Json.toJson(tweet))
       case None => BadRequest(Json.obj("result" -> "failure"))
@@ -47,7 +47,7 @@ class TweetController @Inject()(val tweetService: TweetService, val authenticate
     *
     * @return Action[JsValue]
     */
-  def create: Action[JsValue] = Action.async(parse.json) { implicit rs =>
+  def create: Action[JsValue] = authenticatedAction.async(parse.json) { implicit rs =>
     rs.body.validate[TweetCommand].fold(
       invalid = { e =>
         Future.successful(
@@ -68,7 +68,7 @@ class TweetController @Inject()(val tweetService: TweetService, val authenticate
     * @param tweetId 更新するツイートのID
     * @return Action[JsValue]
     */
-  def update(tweetId: Long): Action[JsValue] = Action.async(parse.json) { implicit rs =>
+  def update(tweetId: Long): Action[JsValue] = authenticatedAction.async(parse.json) { implicit rs =>
     rs.body.validate[TweetCommand].fold(
       invalid = { e =>
         Future.successful(
@@ -89,7 +89,7 @@ class TweetController @Inject()(val tweetService: TweetService, val authenticate
     * @param tweetId 削除するツイートのID
     * @return
     */
-  def delete(tweetId: Long): Action[AnyContent] = Action.async { implicit rs =>
+  def delete(tweetId: Long): Action[AnyContent] = authenticatedAction.async { implicit rs =>
     tweetService.delete(tweetId).map { _ =>
       Ok(Json.obj("result" -> "success"));
     }
