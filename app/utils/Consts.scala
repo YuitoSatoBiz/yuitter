@@ -13,6 +13,7 @@ object Consts {
   val DefaultVersionNo = 0L
   val PasswordMinLength = 8
   val EmailAddressMaxLength = 50
-  val CacheRetentionPeriod = 30.days
-
+  val AccountNameMaxLength = 50
+  val ImageMaxLength = 200
+  val CacheRetentionPeriod: FiniteDuration = 30.days
 }

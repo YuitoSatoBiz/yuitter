@@ -3,7 +3,7 @@ package services
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import javax.inject.Inject
 
-import formats.{AccountCommand, AccountView, KeywordCommand}
+import formats.{AccountCreateCommand, AccountUpdateCommand, AccountView, KeywordCommand}
 import play.api.libs.json.JsValue
 import play.api.mvc.AnyContent
 import repositories.AccountRepositoryJDBC
@@ -35,21 +35,12 @@ class AccountService @Inject()(val accountJdbc: AccountRepositoryJDBC, val dbCon
     db.run(accountJdbc.find(accountId))
   }
 
-  def create(form: AccountCommand)(implicit rs: AuthenticatedRequest[JsValue]): Future[Int] = {
+  def create(form: AccountCreateCommand)(implicit rs: AuthenticatedRequest[JsValue]): Future[Int] = {
     db.run(accountJdbc.create(form, rs.memberId))
   }
 
-  def update(accountId: Long, form: AccountCommand)(implicit rs: AuthenticatedRequest[JsValue]): Future[Unit] = {
-    for {
-      versionNo <- {
-        if (form.versionNo.nonEmpty) {
-          Future.successful(form.versionNo.get)
-        } else {
-          Future.failed(new IllegalArgumentException("バージョン番号がありません。"))
-        }
-      }
-      _ <- db.run(accountJdbc.update(accountId, rs.memberId, versionNo, form))
-    } yield ()
+  def update(accountId: Long, form: AccountUpdateCommand)(implicit rs: AuthenticatedRequest[JsValue]): Future[Int] = {
+    db.run(accountJdbc.update(accountId, rs.memberId, form))
   }
 
   def delete(accountId: Long)(implicit rs: AuthenticatedRequest[AnyContent]): Future[Int] = {

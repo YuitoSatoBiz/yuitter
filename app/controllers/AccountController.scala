@@ -1,7 +1,7 @@
 package controllers
 
 import javax.inject.Inject
-import formats.{AccountCommand, KeywordCommand}
+import formats.{AccountCreateCommand, AccountUpdateCommand, KeywordCommand}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent, Controller}
@@ -79,7 +79,7 @@ class AccountController @Inject()(val authenticatedAction: AuthenticatedAction, 
     * @return 処理の結果
     */
   def create: Action[JsValue] = authenticatedAction.async(parse.json) { implicit rs =>
-    rs.body.validate[AccountCommand].fold(
+    rs.body.validate[AccountCreateCommand].fold(
       invalid = { e =>
         Future.successful(
           BadRequest(Json.obj("result" -> "failure", "error" -> JsError.toJson(e)))
@@ -99,7 +99,7 @@ class AccountController @Inject()(val authenticatedAction: AuthenticatedAction, 
     * @return 処理の結果
     */
   def update(accountId: Long): Action[JsValue] = authenticatedAction.async(parse.json) { implicit rs =>
-    rs.body.validate[AccountCommand].fold(
+    rs.body.validate[AccountUpdateCommand].fold(
       invalid = { e =>
         Future.successful(
           BadRequest(Json.obj("result" -> "failure", "error" -> JsError.toJson(e)))

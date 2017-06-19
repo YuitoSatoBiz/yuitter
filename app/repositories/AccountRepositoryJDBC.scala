@@ -3,7 +3,7 @@ package repositories
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import javax.inject.Inject
-import formats.{AccountCommand, AccountView}
+import formats.{AccountCreateCommand, AccountUpdateCommand, AccountView}
 import models.Tables.{Account, AccountFollowing, AccountRow}
 import slick.driver.MySQLDriver.api._
 import utils.Consts
@@ -65,7 +65,7 @@ class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
       })
   }
 
-  def create(form: AccountCommand, memberId: Long): DBIO[Int] = {
+  def create(form: AccountCreateCommand, memberId: Long): DBIO[Int] = {
     Account += AccountRow(
       accountId = Consts.DefaultId,
       memberId = memberId,
@@ -78,11 +78,11 @@ class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
     )
   }
 
-  def update(accountId: Long, memberId: Long, versionNo: Long, form: AccountCommand): DBIO[Int] = {
+  def update(accountId: Long, memberId: Long, form: AccountUpdateCommand): DBIO[Int] = {
     Account
-      .filter(a => (a.accountId === accountId.bind) && (a.memberId === memberId.bind) && (a.versionNo === form.versionNo.get.bind))
+      .filter(a => (a.accountId === accountId.bind) && (a.memberId === memberId.bind) && (a.versionNo === form.versionNo.bind))
       .map(a => (a.accountName, a.avatar, a.backgroundImage, a.versionNo, a.updateDatetime))
-      .update(form.accountName, form.avatar, form.backgroundImage, form.versionNo.get, Timestamp.valueOf(LocalDateTime.now))
+      .update(form.accountName.get, form.avatar, form.backgroundImage, form.versionNo + 1, Timestamp.valueOf(LocalDateTime.now))
   }
 
   def delete(accountId: Long, memberId: Long): DBIO[Int] = {
