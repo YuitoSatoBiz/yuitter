@@ -21,6 +21,10 @@ class AccountService @Inject()(val accountJdbc: AccountRepositoryJDBC, val dbCon
     db.run(accountJdbc.search(form.keyword))
   }
 
+  def listByMemberId(memberId: Long): Future[Seq[AccountView]] = {
+    db.run(accountJdbc.listByMemberId(memberId))
+  }
+
   def listFollowers(accountId: Long): Future[Seq[AccountView]] = {
     db.run(accountJdbc.listFollowers(accountId))
   }

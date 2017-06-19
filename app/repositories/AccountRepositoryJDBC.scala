@@ -25,6 +25,15 @@ class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
       })
   }
 
+  def listByMemberId(memberId: Long): DBIO[Seq[AccountView]] = {
+    Account
+      .filter(_.memberId === memberId)
+      .result
+      .map(_.map {a =>
+        AccountView.from(a)
+      })
+  }
+
   def listFollowers(accountId: Long): DBIO[Seq[AccountView]] = {
     Account
       .join(AccountFollowing)

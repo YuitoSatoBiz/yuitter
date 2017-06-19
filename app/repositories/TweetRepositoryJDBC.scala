@@ -4,9 +4,8 @@ import java.sql.Timestamp
 import java.time.LocalDateTime
 import javax.inject.Inject
 import formats.{AccountView, TweetCommand, TweetView}
-import models.Tables.{Account, AccountTweet, Tweet}
+import models.Tables.{Account, AccountFollowing, AccountTweet, AccountTweetRow, Tweet, TweetRow}
 import slick.driver.MySQLDriver.api._
-import models.Tables.{AccountTweetRow, TweetRow}
 import utils.Consts
 import scala.concurrent.ExecutionContext
 
@@ -15,31 +14,37 @@ import scala.concurrent.ExecutionContext
   *
   * @author yuito.sato
   */
-class TweetRepositoryJDBC @Inject()(implicit ec: ExecutionContext){
+class TweetRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
 
-  def list(): DBIO[Seq[TweetView]] = {
-    val subAccountTweet = AccountTweet.join(Account).on {
-      case (at, a) => at.accountId === a.accountId
+  def list(accountId: Long, memberId: Long): DBIO[Seq[TweetView]] = {
+    val subAccount = Account.join(AccountFollowing).on { case (a, af) =>
+      a.accountId === af.followeeId
+    }
+    val subAccountTweet = AccountTweet.join(subAccount).on { case (at, (a, _)) =>
+      at.accountId === a.accountId
     }
     Tweet
-      .join(subAccountTweet).on { case (t, (at, _)) => t.tweetId === at.tweetId }
-      .sortBy { case (t, (_, _)) =>
+      .join(subAccountTweet).on { case (t, (at, (_, _))) => t.tweetId === at.tweetId }
+      .filter { case (_, (_, (_, af))) =>
+        af.followerId === accountId.bind
+      }
+      .sortBy { case (t, (_, (_, _))) =>
         t.registerDatetime.desc
       }
       .result
       .map {
         rows =>
-          rows.map { case (t, (_, _)) =>
+          rows.map { case (t, (_, (_, _))) =>
             t.tweetId
           }.distinct.map { tweetId =>
-            rows.groupBy { case (t, (_, _)) =>
+            rows.groupBy { case (t, (_, (_, _))) =>
               t.tweetId
             }.filter { case (id, _) =>
               id == tweetId
             }
           }.flatMap(_.map { case (_, tuples) =>
             val tweet = tuples.map(_._1).head
-            val accounts = tuples.map(_._2).map(_._2).map(AccountView.from)
+            val accounts = tuples.map(_._2).map(_._2).map(_._1).map(AccountView.from)
             TweetView.from(tweet, accounts)
           }.toSeq)
       }

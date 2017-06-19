@@ -1,11 +1,14 @@
 package controllers
 
 import javax.inject.Inject
+
 import formats.TweetCommand
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent, Controller}
+import security.AuthenticatedAction
 import services.TweetService
+
 import scala.concurrent.Future
 
 /**
@@ -13,15 +16,15 @@ import scala.concurrent.Future
   *
   * @author yuito.sato
   */
-class TweetController @Inject()(val tweetService: TweetService) extends Controller {
+class TweetController @Inject()(val tweetService: TweetService, val authenticatedAction: AuthenticatedAction) extends Controller {
 
   /**
     * Tweetの一覧取得 GET /api/tweets
     *
     * @return Action[AnyContent]
     */
-  def list: Action[AnyContent] = Action.async { implicit rs =>
-    tweetService.list().map { tweets =>
+  def list(accountId: Long): Action[AnyContent] = authenticatedAction.async { implicit rs =>
+    tweetService.list(accountId).map { tweets =>
       Ok(Json.toJson(tweets))
     }
   }
