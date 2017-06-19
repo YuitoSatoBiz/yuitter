@@ -1,7 +1,8 @@
 package security
 
 import javax.inject.Inject
-import play.api.mvc.{ActionBuilder, Request, Result, Results}
+import play.api.mvc.Results._
+import play.api.mvc.{ActionBuilder, Request, Result}
 import services.MemberService
 import play.api.libs.json._
 import scala.concurrent.Future
@@ -18,7 +19,7 @@ class AuthenticatedAction @Inject()(val memberService: MemberService) extends Ac
     if (optMemberId.nonEmpty) {
       block(new AuthenticatedRequest(optMemberId.get, request))
     } else {
-      Future.successful(Results.BadRequest(Json.obj("result" -> "failure", "error" -> "ログインが必要です")))
+      Future.successful(Unauthorized(Json.obj("result" -> "failure", "error" -> "ログインが必要です")))
     }
   }
 }
