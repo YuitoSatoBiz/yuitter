@@ -45,7 +45,7 @@ class AccountService @Inject()(val accountJdbc: AccountRepositoryJDBC, val dbCon
     db.run(accountJdbc.update(accountId, rs.memberId, form))
   }
 
-  def delete(accountId: Long)(implicit rs: AuthenticatedRequest[AnyContent]): Future[Int] = {
+  def delete(accountId: Long)(implicit rs: AuthenticatedRequest[AnyContent]): Future[(Int, Int)] = {
     db.run(accountJdbc.delete(accountId, rs.memberId))
   }
 }
