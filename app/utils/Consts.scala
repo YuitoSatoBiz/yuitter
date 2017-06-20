@@ -17,4 +17,5 @@ object Consts {
   val ImageMaxLength = 200
   val CacheRetentionPeriod: FiniteDuration = 30.days
   val AutoIncremental = 1L
+  val TweetTextMaxLength = 140
 }
