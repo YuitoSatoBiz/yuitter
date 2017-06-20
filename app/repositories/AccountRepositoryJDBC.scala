@@ -4,7 +4,7 @@ import java.sql.Timestamp
 import java.time.LocalDateTime
 import javax.inject.Inject
 import formats.{AccountCreateCommand, AccountUpdateCommand, AccountView}
-import models.Tables.{Account, AccountFollowing, AccountRow}
+import models.Tables.{Account, AccountFollowing, AccountRow, AccountTweet}
 import slick.driver.MySQLDriver.api._
 import utils.Consts
 import scala.concurrent.ExecutionContext
@@ -19,6 +19,15 @@ class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
   def search(keyword: String): DBIO[Seq[AccountView]] = {
     Account
       .filter(_.accountName like "%" + keyword + "%")
+      .result
+      .map(_.map { a =>
+        AccountView.from(a)
+      })
+  }
+
+  def listByMemberId(memberId: Long): DBIO[Seq[AccountView]] = {
+    Account
+      .filter(_.memberId === memberId)
       .result
       .map(_.map { a =>
         AccountView.from(a)
@@ -82,12 +91,21 @@ class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
     Account
       .filter(a => (a.accountId === accountId.bind) && (a.memberId === memberId.bind) && (a.versionNo === form.versionNo.bind))
       .map(a => (a.accountName, a.avatar, a.backgroundImage, a.versionNo, a.updateDatetime))
-      .update(form.accountName.get, form.avatar, form.backgroundImage, form.versionNo + 1L, Timestamp.valueOf(LocalDateTime.now))
+      .update(form.accountName.get, form.avatar, form.backgroundImage, form.versionNo + Consts.AutoIncremental, Timestamp.valueOf(LocalDateTime.now))
   }
 
-  def delete(accountId: Long, memberId: Long): DBIO[Int] = {
-    Account
-      .filter(a => a.accountId === accountId.bind && a.memberId === memberId.bind)
-      .delete
+  def delete(accountId: Long, memberId: Long): DBIO[(Int, Int)] = {
+    (for {
+      accountTweetResult <- AccountTweet
+        .filter(at =>
+          (at.accountId === accountId.bind) &&
+          (at.accountId in Account
+            .filter(_.memberId === memberId.bind)
+            .map(_.accountId))
+        ).delete
+      accountResult <- Account
+        .filter(a => a.accountId === accountId.bind && a.memberId === memberId.bind)
+        .delete
+    } yield (accountTweetResult, accountResult)).transactionally
   }
 }

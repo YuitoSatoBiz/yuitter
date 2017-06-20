@@ -63,11 +63,11 @@ trait Tables {
   lazy val Account = new TableQuery(tag => new Account(tag))
 
   /** Entity class storing rows of table AccountFollowing
-   *  @param memberFollowingId Database column MEMBER_FOLLOWING_ID SqlType(BIGINT), AutoInc, PrimaryKey
+   *  @param accountFollowingId Database column ACCOUNT_FOLLOWING_ID SqlType(BIGINT), PrimaryKey
    *  @param followerId Database column FOLLOWER_ID SqlType(BIGINT)
    *  @param followeeId Database column FOLLOWEE_ID SqlType(BIGINT)
    *  @param registerDatetime Database column REGISTER_DATETIME SqlType(DATETIME) */
-  case class AccountFollowingRow(memberFollowingId: Long, followerId: Long, followeeId: Long, registerDatetime: java.sql.Timestamp)
+  case class AccountFollowingRow(accountFollowingId: Long, followerId: Long, followeeId: Long, registerDatetime: java.sql.Timestamp)
   /** GetResult implicit for fetching AccountFollowingRow objects using plain SQL queries */
   implicit def GetResultAccountFollowingRow(implicit e0: GR[Long], e1: GR[java.sql.Timestamp]): GR[AccountFollowingRow] = GR{
     prs => import prs._
@@ -75,12 +75,12 @@ trait Tables {
   }
   /** Table description of table ACCOUNT_FOLLOWING. Objects of this class serve as prototypes for rows in queries. */
   class AccountFollowing(_tableTag: Tag) extends Table[AccountFollowingRow](_tableTag, "ACCOUNT_FOLLOWING") {
-    def * = (memberFollowingId, followerId, followeeId, registerDatetime) <> (AccountFollowingRow.tupled, AccountFollowingRow.unapply)
+    def * = (accountFollowingId, followerId, followeeId, registerDatetime) <> (AccountFollowingRow.tupled, AccountFollowingRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(memberFollowingId), Rep.Some(followerId), Rep.Some(followeeId), Rep.Some(registerDatetime)).shaped.<>({r=>import r._; _1.map(_=> AccountFollowingRow.tupled((_1.get, _2.get, _3.get, _4.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(accountFollowingId), Rep.Some(followerId), Rep.Some(followeeId), Rep.Some(registerDatetime)).shaped.<>({r=>import r._; _1.map(_=> AccountFollowingRow.tupled((_1.get, _2.get, _3.get, _4.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
-    /** Database column MEMBER_FOLLOWING_ID SqlType(BIGINT), AutoInc, PrimaryKey */
-    val memberFollowingId: Rep[Long] = column[Long]("MEMBER_FOLLOWING_ID", O.AutoInc, O.PrimaryKey)
+    /** Database column ACCOUNT_FOLLOWING_ID SqlType(BIGINT), PrimaryKey */
+    val accountFollowingId: Rep[Long] = column[Long]("ACCOUNT_FOLLOWING_ID", O.PrimaryKey)
     /** Database column FOLLOWER_ID SqlType(BIGINT) */
     val followerId: Rep[Long] = column[Long]("FOLLOWER_ID")
     /** Database column FOLLOWEE_ID SqlType(BIGINT) */

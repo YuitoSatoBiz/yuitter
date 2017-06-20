@@ -106,8 +106,9 @@ class AccountController @Inject()(val authenticatedAction: AuthenticatedAction, 
         )
       },
       valid = { form =>
-        accountService.update(accountId, form).map { _ =>
-          Ok(Json.obj("result" -> "success"))
+        accountService.update(accountId, form).map {
+          case 0 => BadRequest(Json.obj("result" -> "failure", "error" -> "更新に失敗しました。"))
+          case _ => Ok(Json.obj("result" -> "success"))
         }
       }
     )
@@ -119,8 +120,9 @@ class AccountController @Inject()(val authenticatedAction: AuthenticatedAction, 
     * @return 処理の結果
     */
   def delete(accountId: Long): Action[AnyContent] = authenticatedAction.async { implicit rs =>
-    accountService.delete(accountId).map { _ =>
-      Ok(Json.obj("result" -> "success"))
+    accountService.delete(accountId).map {
+      case (0, 0) => BadRequest(Json.obj("result" -> "failure", "error" -> "削除に失敗しました。"))
+      case (at, a) => Ok(Json.obj("result" -> "success", "error" -> ("AccountTweet削除:" + at.toString + "件" + "Account削除:" + a.toString + "件")))
     }
   }
 }
