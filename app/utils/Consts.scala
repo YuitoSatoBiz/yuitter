@@ -16,4 +16,5 @@ object Consts {
   val AccountNameMaxLength = 50
   val ImageMaxLength = 200
   val CacheRetentionPeriod: FiniteDuration = 30.days
+  val AutoIncremental = 1L
 }

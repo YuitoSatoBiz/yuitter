@@ -76,8 +76,11 @@ class TweetController @Inject()(val tweetService: TweetService, val authenticate
         )
       },
       valid = { form =>
-        tweetService.update(tweetId, form).map { _ =>
-          Ok(Json.obj("result" -> "success"))
+        tweetService.update(tweetId, form).map {
+          case 0 => BadRequest(Json.obj("result" -> "failure", "error" -> "更新に失敗しました。"))
+          case _ => Ok(Json.obj("result" -> "success"))
+        }.recover{ case e =>
+          Unauthorized(Json.obj("result" -> "failure", "error" -> e.getMessage))
         }
       }
     )
@@ -90,8 +93,11 @@ class TweetController @Inject()(val tweetService: TweetService, val authenticate
     * @return
     */
   def delete(tweetId: Long): Action[AnyContent] = authenticatedAction.async { implicit rs =>
-    tweetService.delete(tweetId).map { _ =>
-      Ok(Json.obj("result" -> "success"));
+    tweetService.delete(tweetId).map {
+      case (0, 0) => BadRequest(Json.obj("result" -> "failure", "error" -> "削除に失敗しました。"))
+      case (at, t) => Ok(Json.obj("result" -> "success", "error" -> ("AccountTweet削除:" + at.toString + "件" + "Tweet削除:" + t.toString + "件")))
+    }.recover{ case e =>
+      Unauthorized(Json.obj("result" -> "failure", "error" -> e.getMessage))
     }
   }
 }

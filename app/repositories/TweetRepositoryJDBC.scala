@@ -4,7 +4,7 @@ import java.sql.Timestamp
 import java.time.LocalDateTime
 import javax.inject.Inject
 import formats.{AccountView, TweetCreateCommand, TweetUpdateCommand, TweetView}
-import models.Tables.{Account, AccountFollowing, AccountTweet, AccountTweetRow, Member, Tweet, TweetRow}
+import models.Tables.{Account, AccountFollowing, AccountTweet, AccountTweetRow, Tweet, TweetRow}
 import play.api.libs.json.JsValue
 import play.api.mvc.AnyContent
 import security.AuthenticatedRequest
@@ -89,37 +89,23 @@ class TweetRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
   }
 
   def update(tweetId: Long, form: TweetUpdateCommand)(implicit rs: AuthenticatedRequest[JsValue]): DBIO[Int] = {
-    val subAccount = Account.join(Member).on { case (a, m) =>
-      a.memberId === m.memberId
-    }
-    val subAccountTweet = AccountTweet.join(subAccount).on { case (at, (a, _)) =>
-      at.accountId === a.accountId
-    }
     Tweet
-      .join(subAccountTweet).on { case (t, (at, _)) => t.tweetId === at.tweetId }
-      .filter { case (t, (_, (_, m))) => (t.tweetId === tweetId.bind) && (t.versionNo === form.versionNo) && (m.memberId === rs.memberId) }
-      .map { case (t, _) => (t.tweetText, t.updateDatetime) }
-      .update(form.tweetText, Timestamp.valueOf(LocalDateTime.now))
+      .filter(t =>
+        (t.tweetId === tweetId.bind) &&
+        (t.versionNo === form.versionNo.bind)
+      )
+      .map(t => (t.tweetText, t.updateDatetime, t.versionNo))
+      .update(form.tweetText, Timestamp.valueOf(LocalDateTime.now), form.versionNo + Consts.AutoIncremental)
   }
 
-  def delete(tweetId: Long)(implicit rs: AuthenticatedRequest[AnyContent]): DBIO[Unit] = {
-    for {
-      _ <- AccountTweet
-        .filter(_ =>
-          Account.filter(a =>
-            a.memberId === rs.memberId
-          ).exists
-        )
+  def delete(tweetId: Long)(implicit rs: AuthenticatedRequest[AnyContent]): DBIO[(Int, Int)] = {
+    (for {
+      accountTweetResult <- AccountTweet
+        .filter(_.tweetId === tweetId.bind)
         .delete
-      _ <- Tweet
-        .filter(_ =>
-          AccountTweet.filter(_ =>
-            Account.filter(a =>
-              a.memberId === rs.memberId
-            ).exists
-          ).exists
-        )
+      tweetResult <- Tweet
+        .filter(_.tweetId === tweetId.bind)
         .delete
-    } yield ()
+    } yield (accountTweetResult, tweetResult)).transactionally
   }
 }

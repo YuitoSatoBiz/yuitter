@@ -3,11 +3,12 @@ package services
 import javax.inject.Inject
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import formats.{MemberCommand, MemberView}
-import play.api.mvc.{AnyContent, Request}
+import play.api.mvc.Request
 import repositories.MemberRepositoryJDBC
 import models.Tables.Member
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import play.api.cache.CacheApi
+import security.AuthenticatedRequest
 import scala.concurrent.{ExecutionContext, Future}
 import slick.driver.JdbcProfile
 
@@ -37,6 +38,10 @@ class MemberService @Inject()(val memberJdbc: MemberRepositoryJDBC, val dbConfig
       token <- rs.session.get("token")
       memberId <- cache.get[Long](token)
     } yield memberId
+  }
+
+  def findByTweetId(tweetId: Long)(implicit rs: AuthenticatedRequest[_]): Future[Option[Member#TableElementType]] = {
+    db.run(memberJdbc.findByTweetId(tweetId))
   }
 
   def findCurrentWithAccounts(implicit rs: Request[_]): Future[Option[MemberView]] = {
