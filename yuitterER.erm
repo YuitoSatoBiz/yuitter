@@ -256,7 +256,7 @@
 			</connections>
 			<columns>
 				<normal_column>
-					<physical_name>MEMBER_FOLLOWING_ID</physical_name>
+					<physical_name>ACCOUNT_FOLLOWING_ID</physical_name>
 					<logical_name>会員フォローイングID</logical_name>
 					<type>bigint</type>
 					<description>会員のフォロワー、フォロイーの組み合わせレコードのID</description>
