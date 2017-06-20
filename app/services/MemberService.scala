@@ -41,7 +41,7 @@ class MemberService @Inject()(val memberJdbc: MemberRepositoryJDBC, val dbConfig
   }
 
   def findByTweetId(tweetId: Long)(implicit rs: AuthenticatedRequest[_]): Future[Option[Member#TableElementType]] = {
-    db.run(memberJdbc.findByTweetId(tweetId))
+    db.run(memberJdbc.findByTweetId(tweetId, rs.memberId))
   }
 
   def findCurrentWithAccounts(implicit rs: Request[_]): Future[Option[MemberView]] = {

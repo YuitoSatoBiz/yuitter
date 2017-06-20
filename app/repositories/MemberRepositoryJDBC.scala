@@ -8,7 +8,6 @@ import models.Tables.{Account, AccountTweet, Member}
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import slick.driver.MySQLDriver.api._
 import models.Tables.{AccountRow, MemberRow}
-import security.AuthenticatedRequest
 import utils.Consts
 import scala.concurrent.ExecutionContext
 
@@ -64,14 +63,14 @@ class MemberRepositoryJDBC @Inject()(val bCrypt: BCryptPasswordEncoder)(implicit
       }
   }
 
-  def findByTweetId(tweetId: Long)(implicit rs: AuthenticatedRequest[_]): DBIO[Option[Member#TableElementType]] = {
+  def findByTweetId(tweetId: Long, memberId: Long): DBIO[Option[Member#TableElementType]] = {
     val subAccount = Account.join(
       AccountTweet
     ).on { case (a, at) => a.accountId === at.accountId }
     Member.join(subAccount)
       .on { case (m, (a, _)) => m.memberId === a.memberId }
       .filter { case (m, (_, t)) =>
-        (m.memberId === rs.memberId.bind) && (t.tweetId === tweetId.bind)
+        (m.memberId === memberId.bind) && (t.tweetId === tweetId.bind)
       }
       .result
       .headOption
