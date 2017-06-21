@@ -35,13 +35,9 @@ class SessionController @Inject()(val memberService: MemberService, val cache: C
           val memberToken = UUID.randomUUID().toString
           val memberId = member.memberId
           cache.set(memberToken, memberId, Consts.CacheRetentionPeriod)
-
-          val accountToken = UUID.randomUUID().toString
           val accountId = member.accounts.head.accountId
-          cache.set(accountToken, accountId, Consts.CacheRetentionPeriod)
-
-          Ok(Json.obj("result" -> "success")).withSession(
-            rs.session + ("memberToken" -> memberToken) + ("accountToken" -> accountToken))
+          Ok(Json.obj("result" -> "success", "accountId" -> accountId)).withSession(
+            rs.session + ("memberToken" -> memberToken) + ("accountId" -> accountId.toString))
         }.recover { case e =>
           BadRequest(Json.obj("result" -> "failure", "error" -> e.getMessage))
         }

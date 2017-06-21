@@ -12,7 +12,6 @@ case class MemberView(
   memberId: Long,
   emailAddress: String,
   password: String,
-  versionNo: Long,
   accounts: Seq[AccountView]
 )
 
@@ -24,7 +23,6 @@ object MemberView {
     MemberView(
       memberId = member.memberId,
       emailAddress = member.emailAddress,
-      versionNo = member.versionNo,
       password = member.password,
       accounts = accounts
     )

@@ -44,7 +44,7 @@ class MemberService @Inject()(val memberJdbc: MemberRepositoryJDBC, val dbConfig
     db.run(memberJdbc.findByTweetId(tweetId, rs.memberId))
   }
 
-  def findCurrentWithAccounts(implicit rs: Request[_]): Future[Option[MemberView]] = {
+  def findCurrent(implicit rs: Request[_]): Future[Option[MemberView]] = {
     findCurrentMemberId.map(memberJdbc.findById) match {
       case Some(dbio) => db.run(dbio)
       case None => Future.failed(new IllegalArgumentException("セッションが切れています"))
