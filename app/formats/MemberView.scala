@@ -11,6 +11,7 @@ import models.Tables.Member
 case class MemberView(
   memberId: Long,
   emailAddress: String,
+  password: String,
   versionNo: Long,
   accounts: Seq[AccountView]
 )
@@ -24,6 +25,7 @@ object MemberView {
       memberId = member.memberId,
       emailAddress = member.emailAddress,
       versionNo = member.versionNo,
+      password = member.password,
       accounts = accounts
     )
   }

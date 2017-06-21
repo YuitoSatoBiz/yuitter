@@ -2,7 +2,6 @@ package controllers
 
 import java.util.UUID
 import javax.inject.Inject
-
 import formats.MemberCommand
 import play.api.libs.json.{JsError, JsValue}
 import play.api.mvc.{Action, AnyContent, Controller}
@@ -10,7 +9,6 @@ import play.api.libs.json._
 import play.api.cache._
 import services.MemberService
 import utils.Consts
-
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
@@ -34,11 +32,16 @@ class SessionController @Inject()(val memberService: MemberService, val cache: C
       },
       valid = { form =>
         memberService.authenticate(form).map { member =>
-          val token = UUID.randomUUID().toString
+          val memberToken = UUID.randomUUID().toString
           val memberId = member.memberId
-          cache.set(token, memberId, Consts.CacheRetentionPeriod)
+          cache.set(memberToken, memberId, Consts.CacheRetentionPeriod)
+
+          val accountToken = UUID.randomUUID().toString
+          val accountId = member.accounts.head.accountId
+          cache.set(accountToken, accountId, Consts.CacheRetentionPeriod)
+
           Ok(Json.obj("result" -> "success")).withSession(
-            rs.session + ("token" -> token))
+            rs.session + ("memberToken" -> memberToken) + ("accountToken" -> accountToken))
         }.recover { case e =>
           BadRequest(Json.obj("result" -> "failure", "error" -> e.getMessage))
         }
