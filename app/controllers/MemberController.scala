@@ -30,7 +30,7 @@ class MemberController @Inject()(val memberService: MemberService)(implicit ec: 
         memberService.create(form).map { _ =>
           Ok(Json.obj("result" -> "success"))
         }.recover { case e =>
-          BadRequest(Json.obj("result" -> e.getMessage))
+          BadRequest(Json.obj("result" -> "failure", "error" -> e.getMessage))
         }
       }
     )
