@@ -55,8 +55,9 @@ class TweetController @Inject()(val tweetService: TweetService, val authenticate
         )
       },
       valid = { form =>
-        tweetService.create(form).map { _ =>
-          Ok(Json.obj("result" -> "success"))
+        tweetService.create(form).map {
+          case Some(tweet) => Ok(Json.toJson(tweet))
+          case None => BadRequest(Json.obj("result" -> "failure"))
         }
       }
     )
@@ -77,8 +78,8 @@ class TweetController @Inject()(val tweetService: TweetService, val authenticate
       },
       valid = { form =>
         tweetService.update(tweetId, form).map {
-          case 0 => BadRequest(Json.obj("result" -> "failure", "error" -> "更新に失敗しました。"))
-          case _ => Ok(Json.obj("result" -> "success"))
+          case Some(tweet) => Ok(Json.toJson(tweet))
+          case None => BadRequest(Json.obj("result" -> "failure"))
         }.recover{ case e =>
           Unauthorized(Json.obj("result" -> "failure", "error" -> e.getMessage))
         }

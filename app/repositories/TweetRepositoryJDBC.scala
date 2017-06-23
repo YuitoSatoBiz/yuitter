@@ -70,22 +70,22 @@ class TweetRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
 
   def create(form: TweetCreateCommand): DBIO[(Long, Option[Int])] = {
     (for {
-      tweet <- Tweet returning Tweet.map(_.tweetId) += TweetRow(
+      tweetId <- Tweet returning Tweet.map(_.tweetId) += TweetRow(
         tweetId = Consts.DefaultId,
         tweetText = form.tweetText,
         registerDatetime = Timestamp.valueOf(LocalDateTime.now),
         updateDatetime = Timestamp.valueOf(LocalDateTime.now),
         versionNo = Consts.DefaultVersionNo
       )
-      accountTweet <- AccountTweet ++= form.accountIds.map { aid =>
+      accountTweetResult <- AccountTweet ++= form.accountIds.map { aid =>
         AccountTweetRow(
           accountTweetId = Consts.DefaultId,
           accountId = aid,
-          tweetId = tweet,
+          tweetId = tweetId,
           registerDatetime = Timestamp.valueOf(LocalDateTime.now)
         )
       }
-    } yield (tweet, accountTweet)).transactionally
+    } yield (tweetId, accountTweetResult)).transactionally
   }
 
   def update(tweetId: Long, form: TweetUpdateCommand)(implicit rs: AuthenticatedRequest[JsValue]): DBIO[Int] = {
