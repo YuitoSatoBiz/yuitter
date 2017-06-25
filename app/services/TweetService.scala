@@ -30,6 +30,10 @@ class TweetService @Inject()(val tweetJdbc: TweetRepositoryJDBC, val accountServ
     } yield tweets
   }
 
+  def searchByAccountId(accountId: Long)(implicit rs: AuthenticatedRequest[AnyContent]): Future[Seq[TweetView]] = {
+    db.run(tweetJdbc.searchByAccountId(accountId))
+  }
+
   def find(tweetId: Long): Future[Option[TweetView]] = {
     db.run(tweetJdbc.find(tweetId: Long))
   }

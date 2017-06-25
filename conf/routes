@@ -11,7 +11,8 @@ GET           /assets/*file                             controllers.Assets.versi
 
 # TweetAPI
 GET           /api/tweets/:accountId                    controllers.TweetController.list(accountId: Long)
-GET           /api/tweets/:tweetId                      controllers.TweetController.find(tweetId: Long)
+GET           /api/tweets/search/:accountId             controllers.TweetController.searchByAccountId(accountId: Long)
+GET           /api/tweets/find/:tweetId                 controllers.TweetController.find(tweetId: Long)
 POST          /api/tweets                               controllers.TweetController.create
 PUT           /api/tweets/:tweetId                      controllers.TweetController.update(tweetId: Long)
 DELETE        /api/tweets/:tweetId                      controllers.TweetController.delete(tweetId: Long)

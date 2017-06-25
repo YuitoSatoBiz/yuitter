@@ -53,6 +53,36 @@ class TweetRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
       }
   }
 
+  def searchByAccountId(accountId: Long): DBIO[Seq[TweetView]] = {
+    val subAccountTweet = AccountTweet.join(Account).on { case (at, a) =>
+      at.accountId === a.accountId
+    }
+    Tweet.join(subAccountTweet).on { case (t, (at, _)) =>
+      t.tweetId === at.tweetId
+    }
+      .filter { case (_, (_, a)) => a.accountId === accountId.bind }
+      .sortBy { case (t, _) =>
+        t.registerDatetime.desc
+      }
+      .result
+      .map {
+        rows =>
+          rows.map { case (t, _) =>
+            t.tweetId
+          }.distinct.map { tweetId =>
+            rows.groupBy { case (t, _) =>
+              t.tweetId
+            }.filter { case (id, _) =>
+              id == tweetId
+            }
+          }.flatMap(_.map { case (_, tuples) =>
+            val tweet = tuples.map(_._1).head
+            val accounts = tuples.map(_._2).map(_._2).map(AccountView.from)
+            TweetView.from(tweet, accounts)
+          }.toSeq)
+      }
+  }
+
   def find(tweetId: Long): DBIO[Option[TweetView]] = {
     val subAccountTweet = AccountTweet.join(Account).on {
       case (at, a) => at.accountId === a.accountId
@@ -92,7 +122,7 @@ class TweetRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
     Tweet
       .filter(t =>
         (t.tweetId === tweetId.bind) &&
-        (t.versionNo === form.versionNo.bind)
+          (t.versionNo === form.versionNo.bind)
       )
       .map(t => (t.tweetText, t.updateDatetime, t.versionNo))
       .update(form.tweetText, Timestamp.valueOf(LocalDateTime.now), form.versionNo + Consts.AutoIncremental)

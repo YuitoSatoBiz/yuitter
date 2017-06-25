@@ -55,7 +55,7 @@ class AccountController @Inject()(val authenticatedAction: AuthenticatedAction, 
     * @return フォロイー一覧
     */
   def listFollowees(accountId: Long): Action[AnyContent] = authenticatedAction.async { implicit rs =>
-    accountService.listFollowers(accountId).map { followers =>
+    accountService.listFollowees(accountId).map { followers =>
       Ok(Json.toJson(followers))
     }
   }

@@ -30,6 +30,17 @@ class TweetController @Inject()(val tweetService: TweetService, val authenticate
   }
 
   /**
+    * 指定アカウントのツイート一覧を取得 GET /api/search/:accountId
+    *
+    * @param accountId 検索するアカウントのiD
+    */
+  def searchByAccountId(accountId: Long): Action[AnyContent] = authenticatedAction.async{ implicit rs =>
+    tweetService.searchByAccountId(accountId).map { tweets =>
+      Ok(Json.toJson(tweets))
+    }
+  }
+
+  /**
     * TweetをtweetIdで検索 GET /api/tweets/:tweetId
     *
     * @param tweetId 検索するツイートのID
