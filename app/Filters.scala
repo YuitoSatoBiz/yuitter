@@ -14,10 +14,10 @@ import play.filters.hosts.AllowedHostsFilter
  * https://www.playframework.com/documentation/latest/SecurityHeaders
  */
 class Filters @Inject() (
-//  csrfFilter: CSRFFilter,
+  csrfFilter: CSRFFilter,
   allowedHostsFilter: AllowedHostsFilter,
   securityHeadersFilter: SecurityHeadersFilter,
   corsFilter: CORSFilter
 ) extends HttpFilters {
-  override def filters = Seq(corsFilter, securityHeadersFilter, allowedHostsFilter)
+  override def filters = Seq(corsFilter, csrfFilter, securityHeadersFilter, allowedHostsFilter)
 }
