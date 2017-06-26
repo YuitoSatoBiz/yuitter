@@ -33,3 +33,9 @@ GET           /api/accounts/:accountId                  controllers.AccountContr
 POST          /api/accounts                             controllers.AccountController.create
 PUT           /api/accounts/:accountId                  controllers.AccountController.update(accountId: Long)
 DELETE        /api/accounts/:accountId                  controllers.AccountController.delete(accountId: Long)
+
+# AccounFollowingAPI
+POST          /api/account_followings/follow            controllers.AccountController.create
+
+#DELETE         /api/account_followings/follow/:followeeId
+#GET            /api/account_followings/follow/:followeeId
