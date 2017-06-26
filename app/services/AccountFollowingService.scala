@@ -15,17 +15,15 @@ import slick.driver.JdbcProfile
   */
 class AccountFollowingService @Inject()(val accountFollowingJdbc: AccountFollowingRepositoryJDBC, val dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
 
-  def create(form: AccountFollowingCommand)(implicit rs: AuthenticatedRequest[_]): Future[Long] = {
-    for {
-      followerId <- {
-        val optFollowerId = rs.cookies.get("accountId").map(_.value.toLong)
-        if (optFollowerId.nonEmpty) {
-          Future.successful(optFollowerId.get)
-        } else {
-          Future.failed(new IllegalArgumentException("セッションが切れています。"))
-        }
-      }
-      followerId <- db.run(accountFollowingJdbc.create(followerId, form.followeeId))
-    } yield followerId
+  def create(followerId: Long, followeeId: Long): Future[Int] = {
+    db.run(accountFollowingJdbc.create(followerId, followeeId))
+  }
+
+  def delete(followerId: Long, followeeId: Long): Future[Int] = {
+    db.run(accountFollowingJdbc.delete(followerId, followeeId))
+  }
+
+  def find(followerId: Long, followeeId: Long): Future[Option[Long]] = {
+    db.run(accountFollowingJdbc.find(followerId, followeeId))
   }
 }

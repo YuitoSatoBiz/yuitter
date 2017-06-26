@@ -35,7 +35,6 @@ PUT           /api/accounts/:accountId                  controllers.AccountContr
 DELETE        /api/accounts/:accountId                  controllers.AccountController.delete(accountId: Long)
 
 # AccounFollowingAPI
-POST          /api/account_followings/follow            controllers.AccountController.create
-
-#DELETE         /api/account_followings/follow/:followeeId
-#GET            /api/account_followings/follow/:followeeId
+POST          /api/account_followings                   controllers.AccountFollowingController.create
+GET           /api/account_followings                   controllers.AccountFollowingController.find(followeeId: Long)
+DELETE        /api/account_followings/:followeeId       controllers.AccountFollowingController.delete(followeeId: Long)

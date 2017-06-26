@@ -2,12 +2,11 @@ package controllers
 
 import javax.inject.Inject
 
-import formats.{AccountCreateCommand, AccountFollowingCommand, AccountUpdateCommand, KeywordCommand}
+import formats.AccountFollowingCommand
 import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent, Controller}
 import security.AuthenticatedAction
-import services.{AccountFollowingService, AccountService, MemberService}
-
+import services.AccountFollowingService
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
@@ -23,12 +22,38 @@ class AccountFollowingController @Inject()(val accountFollowingService: AccountF
         )
       },
       valid = { form =>
-        accountFollowingService.create(form).map { followeeId =>
-          Ok(Json.obj("result" -> "success", "followeeId" -> followeeId))
-        }.recover{ case e =>
-          BadRequest(Json.obj("result" -> "success", "error" -> e.getMessage))
+        val optFollowerId = rs.cookies.get("accountId").map(_.value.toLong)
+        if (optFollowerId.nonEmpty) {
+          accountFollowingService.create(optFollowerId.get, form.followeeId).map { _ =>
+            Ok(Json.obj("result" -> "success"))
+          }
+        } else {
+          Future.successful(BadRequest(Json.obj("result" -> "failure", "error" -> "セッションが切れています。")))
         }
       }
     )
+  }
+
+  def delete(followeeId: Long): Action[AnyContent] = authenticatedAction.async { implicit rs =>
+    val optFollowerId = rs.cookies.get("accountId").map(_.value.toLong)
+    if (optFollowerId.nonEmpty) {
+      accountFollowingService.delete(optFollowerId.get, followeeId).map { _ =>
+        Ok(Json.obj("result" -> "success"))
+      }
+    } else {
+      Future.successful(BadRequest(Json.obj("result" -> "failure", "error" -> "セッションが切れています。")))
+    }
+  }
+
+  def find(followeeId: Long): Action[AnyContent] = authenticatedAction.async { implicit rs =>
+    val optFollowerId = rs.cookies.get("accountId").map(_.value.toLong)
+    if (optFollowerId.nonEmpty) {
+      accountFollowingService.find(optFollowerId.get, followeeId).map {
+        case Some(resultFolloweeId) => Ok(Json.obj("result" -> true, "followeeId" -> resultFolloweeId))
+        case None => Ok(Json.obj("result" -> false))
+      }
+    } else {
+      Future.successful(BadRequest(Json.obj("result" -> "failure", "error" -> "セッションが切れています。")))
+    }
   }
 }

@@ -15,12 +15,26 @@ import scala.concurrent.ExecutionContext
   */
 class AccountFollowingRepositoryJDBC @Inject()(implicit ex: ExecutionContext) {
 
-  def create(followerId: Long, followeeId: Long): DBIO[Long] = {
-    AccountFollowing returning AccountFollowing.map(_.followeeId) += AccountFollowingRow(
+  def create(followerId: Long, followeeId: Long): DBIO[Int] = {
+    AccountFollowing += AccountFollowingRow(
       accountFollowingId = Consts.DefaultId,
       followerId = followerId,
       followeeId = followeeId,
       registerDatetime = Timestamp.valueOf(LocalDateTime.now)
     )
+  }
+
+  def delete(followerId: Long, followeeId: Long): DBIO[Int] = {
+    AccountFollowing
+      .filter(af => af.followerId === followerId.bind && af.followeeId === followeeId.bind)
+      .delete
+  }
+
+  def find(followerId: Long, followeeId: Long): DBIO[Option[Long]] = {
+    AccountFollowing
+      .filter(af => af.followerId === followerId.bind && af.followeeId === followeeId.bind)
+      .result
+      .headOption
+      .map(_.map(_.followeeId))
   }
 }
