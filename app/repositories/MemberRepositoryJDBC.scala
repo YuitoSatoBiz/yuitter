@@ -41,17 +41,31 @@ class MemberRepositoryJDBC @Inject()(val bCrypt: BCryptPasswordEncoder)(implicit
     } yield (memberId, account)).transactionally
   }
 
-  def findByEmailAddress(emailAddress: String): DBIO[Option[Member#TableElementType]] = {
-    Member.filter(_.emailAddress === emailAddress).result.headOption
-  }
-
-  def findByIdWithAccounts(memberId: Long): DBIO[Option[MemberView]] = {
+  def findByEmailAddress(emailAddress: String): DBIO[Option[MemberView]] = {
     Member.join(
       Account
     ).on { case (m, a) =>
       m.memberId === a.memberId
     }.filter { case (m, _) =>
-      m.memberId === memberId
+      m.emailAddress === emailAddress.bind
+    }
+      .result
+      .map { rows =>
+        val member = rows.map(_._1).headOption
+        val accounts = rows.map(_._2).map(AccountView.from)
+        member.map { member =>
+          MemberView.from(member, accounts)
+        }
+      }
+  }
+
+  def findById(memberId: Long): DBIO[Option[MemberView]] = {
+    Member.join(
+      Account
+    ).on { case (m, a) =>
+      m.memberId === a.memberId
+    }.filter { case (m, _) =>
+      m.memberId === memberId.bind
     }
       .result
       .map { rows =>

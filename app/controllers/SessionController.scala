@@ -5,7 +5,7 @@ import javax.inject.Inject
 
 import formats.MemberCommand
 import play.api.libs.json.{JsError, JsValue}
-import play.api.mvc.{Action, AnyContent, Controller}
+import play.api.mvc.{Action, AnyContent, Controller, Cookie}
 import play.api.libs.json._
 import play.api.cache._
 import services.MemberService
@@ -34,11 +34,13 @@ class SessionController @Inject()(val memberService: MemberService, val cache: C
       },
       valid = { form =>
         memberService.authenticate(form).map { member =>
-          val token = UUID.randomUUID().toString
+          val memberToken = UUID.randomUUID().toString
           val memberId = member.memberId
-          cache.set(token, memberId, Consts.CacheRetentionPeriod)
-          Ok(Json.obj("result" -> "success")).withSession(
-            rs.session + ("token" -> token))
+          cache.set(memberToken, memberId, Consts.CacheRetentionPeriod)
+          val accountId = member.accounts.head.accountId
+          Ok(Json.obj("result" -> "success", "accountId" -> accountId))
+            .withSession(rs.session + ("memberToken" -> memberToken))
+            .withCookies(Cookie("accountId", accountId.toString, httpOnly = false))
         }.recover { case e =>
           BadRequest(Json.obj("result" -> "failure", "error" -> e.getMessage))
         }

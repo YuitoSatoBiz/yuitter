@@ -30,6 +30,17 @@ class TweetController @Inject()(val tweetService: TweetService, val authenticate
   }
 
   /**
+    * 指定アカウントのツイート一覧を取得 GET /api/search/:accountId
+    *
+    * @param accountId 検索するアカウントのiD
+    */
+  def searchByAccountId(accountId: Long): Action[AnyContent] = authenticatedAction.async{ implicit rs =>
+    tweetService.searchByAccountId(accountId).map { tweets =>
+      Ok(Json.toJson(tweets))
+    }
+  }
+
+  /**
     * TweetをtweetIdで検索 GET /api/tweets/:tweetId
     *
     * @param tweetId 検索するツイートのID
@@ -55,8 +66,9 @@ class TweetController @Inject()(val tweetService: TweetService, val authenticate
         )
       },
       valid = { form =>
-        tweetService.create(form).map { _ =>
-          Ok(Json.obj("result" -> "success"))
+        tweetService.create(form).map {
+          case Some(tweet) => Ok(Json.toJson(tweet))
+          case None => BadRequest(Json.obj("result" -> "failure"))
         }
       }
     )
@@ -77,8 +89,8 @@ class TweetController @Inject()(val tweetService: TweetService, val authenticate
       },
       valid = { form =>
         tweetService.update(tweetId, form).map {
-          case 0 => BadRequest(Json.obj("result" -> "failure", "error" -> "更新に失敗しました。"))
-          case _ => Ok(Json.obj("result" -> "success"))
+          case Some(tweet) => Ok(Json.toJson(tweet))
+          case None => BadRequest(Json.obj("result" -> "failure"))
         }.recover{ case e =>
           Unauthorized(Json.obj("result" -> "failure", "error" -> e.getMessage))
         }

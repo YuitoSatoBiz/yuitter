@@ -74,8 +74,8 @@ class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
       })
   }
 
-  def create(form: AccountCreateCommand, memberId: Long): DBIO[Int] = {
-    Account += AccountRow(
+  def create(form: AccountCreateCommand, memberId: Long): DBIO[Long] = {
+    Account returning Account.map(_.accountId) += AccountRow(
       accountId = Consts.DefaultId,
       memberId = memberId,
       accountName = form.accountName,

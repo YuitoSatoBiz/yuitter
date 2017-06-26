@@ -30,7 +30,7 @@ class MemberController @Inject()(val memberService: MemberService)(implicit ec: 
         memberService.create(form).map { _ =>
           Ok(Json.obj("result" -> "success"))
         }.recover { case e =>
-          BadRequest(Json.obj("result" -> e.getMessage))
+          BadRequest(Json.obj("result" -> "failure", "error" -> e.getMessage))
         }
       }
     )
@@ -42,7 +42,7 @@ class MemberController @Inject()(val memberService: MemberService)(implicit ec: 
     * @return サインイン中の会員情報
     */
   def findCurrent: Action[AnyContent] = Action.async { implicit rs =>
-    memberService.findCurrentWithAccounts.map { member =>
+    memberService.findCurrent.map { member =>
       Ok(Json.toJson(member))
     }.recover { case e =>
       BadRequest(Json.obj("result" -> "failure", "error" -> e.getMessage))

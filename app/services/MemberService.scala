@@ -35,7 +35,7 @@ class MemberService @Inject()(val memberJdbc: MemberRepositoryJDBC, val dbConfig
     */
   def findCurrentMemberId(implicit rs: Request[_]): Option[Long] = {
     for {
-      token <- rs.session.get("token")
+      token <- rs.session.get("memberToken")
       memberId <- cache.get[Long](token)
     } yield memberId
   }
@@ -44,14 +44,14 @@ class MemberService @Inject()(val memberJdbc: MemberRepositoryJDBC, val dbConfig
     db.run(memberJdbc.findByTweetId(tweetId, rs.memberId))
   }
 
-  def findCurrentWithAccounts(implicit rs: Request[_]): Future[Option[MemberView]] = {
-    findCurrentMemberId.map(memberJdbc.findByIdWithAccounts) match {
+  def findCurrent(implicit rs: Request[_]): Future[Option[MemberView]] = {
+    findCurrentMemberId.map(memberJdbc.findById) match {
       case Some(dbio) => db.run(dbio)
       case None => Future.failed(new IllegalArgumentException("セッションが切れています"))
     }
   }
 
-  def authenticate(form: MemberCommand): Future[Member#TableElementType] = {
+  def authenticate(form: MemberCommand): Future[MemberView] = {
     for {
       optMember <- db.run(memberJdbc.findByEmailAddress(form.emailAddress))
       member <- Future.successful(optMember.getOrElse(throw new IllegalArgumentException("このメールアドレスは登録されていません。")))

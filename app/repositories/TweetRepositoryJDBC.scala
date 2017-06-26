@@ -53,6 +53,36 @@ class TweetRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
       }
   }
 
+  def searchByAccountId(accountId: Long): DBIO[Seq[TweetView]] = {
+    val subAccountTweet = AccountTweet.join(Account).on { case (at, a) =>
+      at.accountId === a.accountId
+    }
+    Tweet.join(subAccountTweet).on { case (t, (at, _)) =>
+      t.tweetId === at.tweetId
+    }
+      .filter { case (_, (_, a)) => a.accountId === accountId.bind }
+      .sortBy { case (t, _) =>
+        t.registerDatetime.desc
+      }
+      .result
+      .map {
+        rows =>
+          rows.map { case (t, _) =>
+            t.tweetId
+          }.distinct.map { tweetId =>
+            rows.groupBy { case (t, _) =>
+              t.tweetId
+            }.filter { case (id, _) =>
+              id == tweetId
+            }
+          }.flatMap(_.map { case (_, tuples) =>
+            val tweet = tuples.map(_._1).head
+            val accounts = tuples.map(_._2).map(_._2).map(AccountView.from)
+            TweetView.from(tweet, accounts)
+          }.toSeq)
+      }
+  }
+
   def find(tweetId: Long): DBIO[Option[TweetView]] = {
     val subAccountTweet = AccountTweet.join(Account).on {
       case (at, a) => at.accountId === a.accountId
@@ -70,29 +100,29 @@ class TweetRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
 
   def create(form: TweetCreateCommand): DBIO[(Long, Option[Int])] = {
     (for {
-      tweet <- Tweet returning Tweet.map(_.tweetId) += TweetRow(
+      tweetId <- Tweet returning Tweet.map(_.tweetId) += TweetRow(
         tweetId = Consts.DefaultId,
         tweetText = form.tweetText,
         registerDatetime = Timestamp.valueOf(LocalDateTime.now),
         updateDatetime = Timestamp.valueOf(LocalDateTime.now),
         versionNo = Consts.DefaultVersionNo
       )
-      accountTweet <- AccountTweet ++= form.accountIds.map { aid =>
+      accountTweetResult <- AccountTweet ++= form.accountIds.map { aid =>
         AccountTweetRow(
           accountTweetId = Consts.DefaultId,
           accountId = aid,
-          tweetId = tweet,
+          tweetId = tweetId,
           registerDatetime = Timestamp.valueOf(LocalDateTime.now)
         )
       }
-    } yield (tweet, accountTweet)).transactionally
+    } yield (tweetId, accountTweetResult)).transactionally
   }
 
   def update(tweetId: Long, form: TweetUpdateCommand)(implicit rs: AuthenticatedRequest[JsValue]): DBIO[Int] = {
     Tweet
       .filter(t =>
         (t.tweetId === tweetId.bind) &&
-        (t.versionNo === form.versionNo.bind)
+          (t.versionNo === form.versionNo.bind)
       )
       .map(t => (t.tweetText, t.updateDatetime, t.versionNo))
       .update(form.tweetText, Timestamp.valueOf(LocalDateTime.now), form.versionNo + Consts.AutoIncremental)

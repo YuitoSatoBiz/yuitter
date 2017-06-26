@@ -30,34 +30,41 @@ class TweetService @Inject()(val tweetJdbc: TweetRepositoryJDBC, val accountServ
     } yield tweets
   }
 
+  def searchByAccountId(accountId: Long)(implicit rs: AuthenticatedRequest[AnyContent]): Future[Seq[TweetView]] = {
+    db.run(tweetJdbc.searchByAccountId(accountId))
+  }
+
   def find(tweetId: Long): Future[Option[TweetView]] = {
     db.run(tweetJdbc.find(tweetId: Long))
   }
 
-  def create(form: TweetCreateCommand)(implicit rs: AuthenticatedRequest[JsValue]): Future[Unit] = {
+  def create(form: TweetCreateCommand)(implicit rs: AuthenticatedRequest[JsValue]): Future[Option[TweetView]] = {
     for {
       accounts <- accountService.listByMemberId(rs.memberId)
-      _ <- {
+      tweetResult <- {
         if (accounts.map(a => a.accountId).exists(id => form.accountIds.contains(id))) {
           db.run(tweetJdbc.create(form))
         } else {
           Future.failed(new IllegalArgumentException("不正なアカウントIDです。"))
         }
+
       }
-    } yield ()
+      tweet <- db.run(tweetJdbc.find(tweetResult._1))
+    } yield tweet
   }
 
-  def update(tweetId: Long, form: TweetUpdateCommand)(implicit rs: AuthenticatedRequest[JsValue]): Future[Int] = {
+  def update(tweetId: Long, form: TweetUpdateCommand)(implicit rs: AuthenticatedRequest[JsValue]): Future[Option[TweetView]] = {
     for {
       member <- memberService.findByTweetId(tweetId)
-      result <- {
+      _ <- {
         if (member.nonEmpty) {
           db.run(tweetJdbc.update(tweetId, form))
         } else {
           Future.failed(new IllegalArgumentException("ツイートを更新する権限がありません"))
         }
       }
-    } yield result
+      tweet <- db.run(tweetJdbc.find(tweetId))
+    } yield tweet
   }
 
   def delete(tweetId: Long)(implicit rs: AuthenticatedRequest[AnyContent]): Future[(Int, Int)] = {
