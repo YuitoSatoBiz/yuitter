@@ -86,8 +86,9 @@ class AccountController @Inject()(val authenticatedAction: AuthenticatedAction, 
         )
       },
       valid = { form =>
-        accountService.create(form).map { _ =>
-          Ok(Json.obj("result" -> "success"))
+        accountService.create(form).map {
+          case Some(account) => Ok(Json.toJson(account))
+          case None => BadRequest(Json.obj("result" -> "failure"))
         }
       }
     )

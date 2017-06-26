@@ -37,8 +37,11 @@ class AccountService @Inject()(val accountJdbc: AccountRepositoryJDBC, val dbCon
     db.run(accountJdbc.find(accountId))
   }
 
-  def create(form: AccountCreateCommand)(implicit rs: AuthenticatedRequest[JsValue]): Future[Int] = {
-    db.run(accountJdbc.create(form, rs.memberId))
+  def create(form: AccountCreateCommand)(implicit rs: AuthenticatedRequest[JsValue]): Future[Option[AccountView]] = {
+    for {
+      accountId <- db.run(accountJdbc.create(form, rs.memberId))
+      account <- db.run(accountJdbc.find(accountId))
+    } yield account
   }
 
   def update(accountId: Long, form: AccountUpdateCommand)(implicit rs: AuthenticatedRequest[JsValue]): Future[Int] = {
