@@ -16,9 +16,20 @@ import scala.concurrent.ExecutionContext
   */
 class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
 
+  def list: DBIO[Seq[AccountView]] = {
+    Account
+      .take(Consts.ContentMaxCountPerPage)
+      .sortBy(_.registerDatetime.desc)
+      .result
+      .map(_.map { a =>
+        AccountView.from(a)
+      })
+  }
+
   def search(keyword: String): DBIO[Seq[AccountView]] = {
     Account
       .filter(_.accountName like "%" + keyword + "%")
+      .take(Consts.ContentMaxCountPerPage)
       .result
       .map(_.map { a =>
         AccountView.from(a)

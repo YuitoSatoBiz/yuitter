@@ -17,6 +17,10 @@ import slick.driver.JdbcProfile
   */
 class AccountService @Inject()(val accountJdbc: AccountRepositoryJDBC, val dbConfigProvider: DatabaseConfigProvider, val memberService: MemberService)(implicit ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
 
+  def list: Future[Seq[AccountView]] = {
+    db.run(accountJdbc.list)
+  }
+
   def search(form: KeywordCommand): Future[Seq[AccountView]] = {
     db.run(accountJdbc.search(form.keyword))
   }

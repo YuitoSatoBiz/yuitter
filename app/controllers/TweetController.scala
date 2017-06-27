@@ -3,20 +3,18 @@ package controllers
 import javax.inject.Inject
 
 import formats.{TweetCreateCommand, TweetUpdateCommand}
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent, Controller}
 import security.AuthenticatedAction
 import services.TweetService
-
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * TWEETテーブルにCRUD処理を行うコントローラー
   *
   * @author yuito.sato
   */
-class TweetController @Inject()(val tweetService: TweetService, val authenticatedAction: AuthenticatedAction) extends Controller {
+class TweetController @Inject()(val tweetService: TweetService, val authenticatedAction: AuthenticatedAction)(implicit ec: ExecutionContext) extends Controller {
 
   /**
     * Tweetの一覧取得 GET /api/tweets

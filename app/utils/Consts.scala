@@ -18,4 +18,5 @@ object Consts {
   val CacheRetentionPeriod: FiniteDuration = 30.days
   val AutoIncremental = 1L
   val TweetTextMaxLength = 140
+  val ContentMaxCountPerPage = 30
 }

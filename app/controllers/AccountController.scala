@@ -2,19 +2,29 @@ package controllers
 
 import javax.inject.Inject
 import formats.{AccountCreateCommand, AccountUpdateCommand, KeywordCommand}
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent, Controller}
 import security.AuthenticatedAction
 import services.{AccountService, MemberService}
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * AccountテーブルのCRUD処理をするコントローラー
   *
   * @author yuito.sato
   */
-class AccountController @Inject()(val authenticatedAction: AuthenticatedAction, val accountService: AccountService, val memberService: MemberService) extends Controller {
+class AccountController @Inject()(val authenticatedAction: AuthenticatedAction, val accountService: AccountService, val memberService: MemberService)(implicit ec: ExecutionContext) extends Controller {
+
+  /**
+    * Acccountの一覧取得 GET /api/accounts
+    *
+    * @return Action[AnyContent]
+    */
+  def list: Action[AnyContent] = authenticatedAction.async { implicit rs =>
+    accountService.list.map { accounts =>
+      Ok(Json.toJson(accounts))
+    }
+  }
 
   /**
     * アカウント名でアカウントを検索 POST /api/accounts/search
