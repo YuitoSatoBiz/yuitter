@@ -16,6 +16,17 @@ import scala.concurrent.{ExecutionContext, Future}
 class AccountController @Inject()(val authenticatedAction: AuthenticatedAction, val accountService: AccountService, val memberService: MemberService)(implicit ec: ExecutionContext) extends Controller {
 
   /**
+    * Acccountの一覧取得 GET /api/accounts
+    *
+    * @return Action[AnyContent]
+    */
+  def list: Action[AnyContent] = authenticatedAction.async { implicit rs =>
+    accountService.list.map { accounts =>
+      Ok(Json.toJson(accounts))
+    }
+  }
+
+  /**
     * アカウント名でアカウントを検索 POST /api/accounts/search
     *
     * @return 検索にマッチしたアカウント一覧

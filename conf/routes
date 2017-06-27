@@ -4,37 +4,38 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET           /                                         controllers.HomeController.index
+GET           /                                          controllers.HomeController.index
 
 # Map static resources from the /public folder to the /assets URL path
-GET           /assets/*file                             controllers.Assets.versioned(path="/public", file: Asset)
+GET           /assets/*file                              controllers.Assets.versioned(path="/public", file: Asset)
 
 # TweetAPI
-GET           /api/tweets/:accountId                    controllers.TweetController.list(accountId: Long)
-GET           /api/tweets/search/:accountId             controllers.TweetController.searchByAccountId(accountId: Long)
-GET           /api/tweets/find/:tweetId                 controllers.TweetController.find(tweetId: Long)
-POST          /api/tweets                               controllers.TweetController.create
-PUT           /api/tweets/:tweetId                      controllers.TweetController.update(tweetId: Long)
-DELETE        /api/tweets/:tweetId                      controllers.TweetController.delete(tweetId: Long)
+GET           /api/tweets/:accountId                     controllers.TweetController.list(accountId: Long)
+GET           /api/tweets/search/:accountId              controllers.TweetController.searchByAccountId(accountId: Long)
+GET           /api/tweets/find/:tweetId                  controllers.TweetController.find(tweetId: Long)
+POST          /api/tweets                                controllers.TweetController.create
+PUT           /api/tweets/:tweetId                       controllers.TweetController.update(tweetId: Long)
+DELETE        /api/tweets/:tweetId                       controllers.TweetController.delete(tweetId: Long)
 
 # MemberAPI
-POST          /api/members                              controllers.MemberController.create
-GET           /api/members/current                      controllers.MemberController.findCurrent
+POST          /api/members                               controllers.MemberController.create
+GET           /api/members/current                       controllers.MemberController.findCurrent
 
 # SessionAPI
-POST          /api/sign_in                              controllers.SessionController.create
-GET           /api/sign_out                             controllers.SessionController.delete
+POST          /api/sign_in                               controllers.SessionController.create
+GET           /api/sign_out                              controllers.SessionController.delete
 
 # AccountAPI
-POST          /api/accounts/search                      controllers.AccountController.search
-GET           /api/accounts/followers/:accountId        controllers.AccountController.listFollowers(accountId: Long)
-GET           /api/accounts/followees/:accountId        controllers.AccountController.listFollowees(accountId: Long)
-GET           /api/accounts/:accountId                  controllers.AccountController.find(accountId: Long)
-POST          /api/accounts                             controllers.AccountController.create
-PUT           /api/accounts/:accountId                  controllers.AccountController.update(accountId: Long)
-DELETE        /api/accounts/:accountId                  controllers.AccountController.delete(accountId: Long)
+GET           /api/accounts                              controllers.AccountController.list
+POST          /api/accounts/search                       controllers.AccountController.search
+GET           /api/accounts/followers/:accountId         controllers.AccountController.listFollowers(accountId: Long)
+GET           /api/accounts/followees/:accountId         controllers.AccountController.listFollowees(accountId: Long)
+GET           /api/accounts/:accountId                   controllers.AccountController.find(accountId: Long)
+POST          /api/accounts                              controllers.AccountController.create
+PUT           /api/accounts/:accountId                   controllers.AccountController.update(accountId: Long)
+DELETE        /api/accounts/:accountId                   controllers.AccountController.delete(accountId: Long)
 
 # AccounFollowingAPI
-POST          /api/account_followings                   controllers.AccountFollowingController.create
-GET           /api/account_followings                   controllers.AccountFollowingController.find(followeeId: Long)
-DELETE        /api/account_followings/:followeeId       controllers.AccountFollowingController.delete(followeeId: Long)
+POST          /api/account_followings                    controllers.AccountFollowingController.create
+GET           /api/account_followings                    controllers.AccountFollowingController.find(followeeId: Long)
+DELETE        /api/account_followings/:followeeId        controllers.AccountFollowingController.delete(followeeId: Long)
