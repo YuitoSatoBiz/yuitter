@@ -10,3 +10,5 @@ target
 git
 *.sql
 *.iml
+/public/images
+
