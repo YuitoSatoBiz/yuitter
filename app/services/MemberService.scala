@@ -17,7 +17,7 @@ import slick.driver.JdbcProfile
   *
   * @author yuito.sato
   */
-class MemberService @Inject()(val memberJdbc: MemberRepositoryJDBC, val dbConfigProvider: DatabaseConfigProvider, val cache: CacheApi, val bCrypt: BCryptPasswordEncoder)(implicit ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
+class MemberService @Inject()(val memberJdbc: MemberRepositoryJDBC, val accountFollowingService: AccountFollowingService, val dbConfigProvider: DatabaseConfigProvider, val cache: CacheApi, val bCrypt: BCryptPasswordEncoder)(implicit ec: ExecutionContext) extends HasDatabaseConfigProvider[JdbcProfile] {
 
   def create(form: MemberCommand): Future[Unit] = {
     for {

@@ -3,12 +3,13 @@ package repositories
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import javax.inject.Inject
+
 import formats.{AccountView, MemberCommand, MemberView}
-import models.Tables.{Account, AccountTweet, Member}
+import models.Tables.{Account, AccountFollowing, AccountFollowingRow, AccountRow, AccountTweet, Member, MemberRow}
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import slick.driver.MySQLDriver.api._
-import models.Tables.{AccountRow, MemberRow}
 import utils.Consts
+
 import scala.concurrent.ExecutionContext
 
 /**
@@ -18,7 +19,7 @@ import scala.concurrent.ExecutionContext
   */
 class MemberRepositoryJDBC @Inject()(val bCrypt: BCryptPasswordEncoder)(implicit ec: ExecutionContext) {
 
-  def create(form: MemberCommand): DBIO[(Long, Int)] = {
+  def create(form: MemberCommand): DBIO[(Long, Long, Int)] = {
     (for {
       memberId <- Member returning Member.map(_.memberId) += MemberRow(
         memberId = Consts.DefaultId,
@@ -28,7 +29,7 @@ class MemberRepositoryJDBC @Inject()(val bCrypt: BCryptPasswordEncoder)(implicit
         updateDatetime = Timestamp.valueOf(LocalDateTime.now),
         versionNo = Consts.DefaultVersionNo
       )
-      account <- Account += AccountRow(
+      accountId <- Account returning Account.map(_.accountId) += AccountRow(
         accountId = Consts.DefaultId,
         memberId = memberId,
         accountName = form.account.get.accountName,
@@ -38,7 +39,13 @@ class MemberRepositoryJDBC @Inject()(val bCrypt: BCryptPasswordEncoder)(implicit
         updateDatetime = Timestamp.valueOf(LocalDateTime.now),
         versionNo = Consts.DefaultVersionNo
       )
-    } yield (memberId, account)).transactionally
+      accountFollowing <- AccountFollowing += AccountFollowingRow(
+        accountFollowingId = Consts.DefaultId,
+        followerId = accountId,
+        followeeId = accountId,
+        registerDatetime = Timestamp.valueOf(LocalDateTime.now)
+      )
+    } yield (memberId, accountId, accountFollowing)).transactionally
   }
 
   def findByEmailAddress(emailAddress: String): DBIO[Option[MemberView]] = {
