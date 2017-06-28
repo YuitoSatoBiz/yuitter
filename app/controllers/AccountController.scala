@@ -16,7 +16,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class AccountController @Inject()(val authenticatedAction: AuthenticatedAction, val accountService: AccountService, val memberService: MemberService)(implicit ec: ExecutionContext) extends Controller {
 
   /**
-    * Acccountの一覧取得 GET /api/accounts
+    * Accountの一覧取得 GET /api/accounts
     *
     * @return Action[AnyContent]
     */
