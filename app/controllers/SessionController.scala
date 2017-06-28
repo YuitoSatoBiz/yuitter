@@ -55,7 +55,7 @@ class SessionController @Inject()(val memberService: MemberService, val cache: C
     */
   def delete: Action[AnyContent] = Action.async { implicit rs =>
     Future {
-      rs.session.get("token").getOrElse {
+      rs.session.get("memberToken").getOrElse {
         throw new IllegalArgumentException("すでにログアウトされています。")
       }
     }.map { token =>
