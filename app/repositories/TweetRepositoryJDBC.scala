@@ -31,10 +31,10 @@ class TweetRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
       .filter { case (_, (_, (_, af))) =>
         af.followerId === accountId.bind
       }
-      .take(Consts.ContentMaxCountPerPage)
       .sortBy { case (t, _) =>
         t.registerDatetime.desc
       }
+      .take(Consts.ContentMaxCountPerPage)
       .result
       .map {
         rows =>

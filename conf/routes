@@ -37,7 +37,7 @@ DELETE        /api/accounts/:accountId                   controllers.AccountCont
 
 # AccounFollowingAPI
 POST          /api/account_followings                    controllers.AccountFollowingController.create
-GET           /api/account_followings                    controllers.AccountFollowingController.find(followeeId: Long)
+GET           /api/account_followings/:followeeId        controllers.AccountFollowingController.find(followeeId: Long)
 DELETE        /api/account_followings/:followeeId        controllers.AccountFollowingController.delete(followeeId: Long)
 
 # ImageAPI

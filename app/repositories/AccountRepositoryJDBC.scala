@@ -18,8 +18,8 @@ class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
 
   def list: DBIO[Seq[AccountView]] = {
     Account
-      .take(Consts.ContentMaxCountPerPage)
       .sortBy(_.registerDatetime.desc)
+      .take(Consts.ContentMaxCountPerPage)
       .result
       .map(_.map { a =>
         AccountView.from(a)
