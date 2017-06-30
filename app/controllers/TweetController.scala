@@ -7,6 +7,7 @@ import play.api.libs.json._
 import play.api.mvc.{Action, AnyContent, Controller}
 import security.AuthenticatedAction
 import services.TweetService
+
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
@@ -24,6 +25,8 @@ class TweetController @Inject()(val tweetService: TweetService, val authenticate
   def list(accountId: Long): Action[AnyContent] = authenticatedAction.async { implicit rs =>
     tweetService.list(accountId).map { tweets =>
       Ok(Json.toJson(tweets))
+    }.recover { case e =>
+      Unauthorized(Json.obj("result" -> "failure", "error" -> e.getMessage))
     }
   }
 
@@ -32,7 +35,7 @@ class TweetController @Inject()(val tweetService: TweetService, val authenticate
     *
     * @param accountId 検索するアカウントのiD
     */
-  def searchByAccountId(accountId: Long): Action[AnyContent] = authenticatedAction.async{ implicit rs =>
+  def searchByAccountId(accountId: Long): Action[AnyContent] = authenticatedAction.async { implicit rs =>
     tweetService.searchByAccountId(accountId).map { tweets =>
       Ok(Json.toJson(tweets))
     }
@@ -67,6 +70,8 @@ class TweetController @Inject()(val tweetService: TweetService, val authenticate
         tweetService.create(form).map {
           case Some(tweet) => Ok(Json.toJson(tweet))
           case None => BadRequest(Json.obj("result" -> "failure"))
+        }.recover { case e =>
+          Unauthorized(Json.obj("result" -> "failure", "error" -> e.getMessage))
         }
       }
     )
@@ -89,7 +94,7 @@ class TweetController @Inject()(val tweetService: TweetService, val authenticate
         tweetService.update(tweetId, form).map {
           case Some(tweet) => Ok(Json.toJson(tweet))
           case None => BadRequest(Json.obj("result" -> "failure"))
-        }.recover{ case e =>
+        }.recover { case e =>
           Unauthorized(Json.obj("result" -> "failure", "error" -> e.getMessage))
         }
       }
@@ -106,7 +111,7 @@ class TweetController @Inject()(val tweetService: TweetService, val authenticate
     tweetService.delete(tweetId).map {
       case (0, 0) => BadRequest(Json.obj("result" -> "failure", "error" -> "削除に失敗しました。"))
       case (at, t) => Ok(Json.obj("result" -> "success", "error" -> ("AccountTweet削除:" + at.toString + "件" + "Tweet削除:" + t.toString + "件")))
-    }.recover{ case e =>
+    }.recover { case e =>
       Unauthorized(Json.obj("result" -> "failure", "error" -> e.getMessage))
     }
   }

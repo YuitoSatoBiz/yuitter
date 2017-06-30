@@ -1,14 +1,16 @@
 package services
 
 import javax.inject.Inject
+
 import formats.{TweetCreateCommand, TweetUpdateCommand, TweetView}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import play.api.libs.json.JsValue
 import play.api.mvc.AnyContent
 import repositories.TweetRepositoryJDBC
 import security.AuthenticatedRequest
-import scala.concurrent.{ExecutionContext, Future}
 import slick.driver.JdbcProfile
+
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * TWEETテーブルに対してDB接続を行うクラス
@@ -42,12 +44,11 @@ class TweetService @Inject()(val tweetJdbc: TweetRepositoryJDBC, val accountServ
     for {
       accounts <- accountService.listByMemberId(rs.memberId)
       tweetResult <- {
-        if (accounts.map(a => a.accountId).exists(id => form.accountIds.contains(id))) {
+        if (form.accountIds.forall(id => accounts.map(_.accountId).contains(id))) {
           db.run(tweetJdbc.create(form))
         } else {
           Future.failed(new IllegalArgumentException("不正なアカウントIDです。"))
         }
-
       }
       tweet <- db.run(tweetJdbc.find(tweetResult._1))
     } yield tweet

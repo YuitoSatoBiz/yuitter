@@ -1,14 +1,16 @@
 package services
 
-import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import javax.inject.Inject
+
 import formats.{AccountCreateCommand, AccountUpdateCommand, AccountView, KeywordCommand}
+import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import play.api.libs.json.JsValue
 import play.api.mvc.AnyContent
 import repositories.AccountRepositoryJDBC
 import security.AuthenticatedRequest
-import scala.concurrent.{ExecutionContext, Future}
 import slick.driver.JdbcProfile
+
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * Accountテーブルに対してのビジネスロジックを実装するクラス

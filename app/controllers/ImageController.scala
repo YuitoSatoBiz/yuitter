@@ -3,11 +3,9 @@ package controllers
 import java.nio.file.FileSystems
 import javax.inject.Inject
 
-import play.api.Logger
 import play.api.libs.Files
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, Controller, MultipartFormData}
-import security.AuthenticatedAction
+import play.api.mvc.{Action, Controller, MultipartFormData}
 
 import scala.concurrent.ExecutionContext
 
@@ -20,7 +18,7 @@ class ImageController @Inject()(implicit val ec: ExecutionContext) extends Contr
     rs.body.file("image").map { image =>
       import java.io.File
       val filename = image.filename
-      val projectPath = FileSystems.getDefault.getPath("public/images/").toAbsolutePath.toString
+      val projectPath = FileSystems.getDefault.getPath("../dist/assets/public/").toAbsolutePath.toString
       image.ref.moveTo(new File(s"$projectPath/$filename"))
       Ok(Json.obj("result" -> "success"))
     }.getOrElse {

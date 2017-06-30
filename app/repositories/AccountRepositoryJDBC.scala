@@ -3,10 +3,12 @@ package repositories
 import java.sql.Timestamp
 import java.time.LocalDateTime
 import javax.inject.Inject
+
 import formats.{AccountCreateCommand, AccountUpdateCommand, AccountView}
-import models.Tables.{Account, AccountFollowing, AccountRow, AccountTweet}
+import models.Tables.{Account, AccountFollowing, AccountFollowingRow, AccountRow, AccountTweet}
 import slick.driver.MySQLDriver.api._
 import utils.Consts
+
 import scala.concurrent.ExecutionContext
 
 /**
@@ -86,16 +88,24 @@ class AccountRepositoryJDBC @Inject()(implicit ec: ExecutionContext) {
   }
 
   def create(form: AccountCreateCommand, memberId: Long): DBIO[Long] = {
-    Account returning Account.map(_.accountId) += AccountRow(
-      accountId = Consts.DefaultId,
-      memberId = memberId,
-      accountName = form.accountName,
-      avatar = form.avatar,
-      backgroundImage = form.backgroundImage,
-      registerDatetime = Timestamp.valueOf(LocalDateTime.now),
-      updateDatetime = Timestamp.valueOf(LocalDateTime.now),
-      versionNo = Consts.DefaultVersionNo
-    )
+    (for {
+      accountId <- Account returning Account.map(_.accountId) += AccountRow(
+        accountId = Consts.DefaultId,
+        memberId = memberId,
+        accountName = form.accountName,
+        avatar = form.avatar,
+        backgroundImage = form.backgroundImage,
+        registerDatetime = Timestamp.valueOf(LocalDateTime.now),
+        updateDatetime = Timestamp.valueOf(LocalDateTime.now),
+        versionNo = Consts.DefaultVersionNo
+      )
+      _ <- AccountFollowing += AccountFollowingRow(
+        accountFollowingId = Consts.DefaultId,
+        followerId = accountId,
+        followeeId = accountId,
+        registerDatetime = Timestamp.valueOf(LocalDateTime.now)
+      )
+    } yield accountId).transactionally
   }
 
   def update(accountId: Long, memberId: Long, form: AccountUpdateCommand): DBIO[Int] = {
