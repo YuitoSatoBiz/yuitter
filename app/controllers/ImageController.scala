@@ -19,7 +19,9 @@ class ImageController @Inject()(implicit val ec: ExecutionContext) extends Contr
       import java.io.File
       val filename = image.filename
       val projectPath = FileSystems.getDefault.getPath("../dist/assets/public/").toAbsolutePath.toString
-      image.ref.moveTo(new File(s"$projectPath/$filename"))
+      val file = new File(s"$projectPath/$filename")
+      file.setReadable(true, false)
+      image.ref.moveTo(file)
       Ok(Json.obj("result" -> "success"))
     }.getOrElse {
       BadRequest(Json.obj("result" -> "failure"))
